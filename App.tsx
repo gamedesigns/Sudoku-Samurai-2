@@ -1,4 +1,5 @@
 
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { Play, Settings, Palette, RefreshCw, Info, Lightbulb, Brush, Swords } from 'lucide-react';
 import { lightTheme, darkTheme, warmTheme } from './themes.ts';
@@ -115,6 +116,9 @@ const Game: React.FC = () => {
     // FIX: Explicitly type currentConfig as GameConfig to resolve type inference issues.
     const currentConfig: GameConfig = gameState === 'duel' && duel.duelConfig ? { size: duel.duelConfig.puzzleSize, mode: 'Duel', difficulty: duel.duelConfig.difficulty } : settings.gameConfig;
     
+    const isGameActive = gameState === 'inprogress' || (gameState === 'duel' && duel.duelState && !duel.duelState.isPaused);
+    const isInputDisabled = !isGameActive || (!settings.swooshInput && !selectedCell);
+    
     // Loading screen
     if (!grid) {
         return <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text} flex items-center justify-center`}>Loading...</div>;
@@ -155,7 +159,23 @@ const Game: React.FC = () => {
                         <div className="controls-wrapper mt-4 w-full max-w-md flex flex-col items-center space-y-4">
                              <GameControls theme={theme} inputMode={inputMode} setInputMode={setInputMode} gameState={gameState} openDuelSetup={() => modals.openModal(modals.setDuelSetupOpen)} />
                             <div className="flex items-stretch w-full space-x-2 sm:space-x-3">
-                                <NumberPad theme={theme} gameConfig={currentConfig} displayMode={settings.displayMode} onNumberClick={(num) => placeNumber(selectedCell![0], selectedCell![1], num, grid, duel.duelState, duel.setDuelState)} onDeleteClick={() => placeNumber(selectedCell![0], selectedCell![1], 0, grid, duel.duelState, duel.setDuelState)} onKeypadDragStart={handleKeypadDragStart} />
+                                <NumberPad
+                                    theme={theme}
+                                    gameConfig={currentConfig}
+                                    displayMode={settings.displayMode}
+                                    disabled={isInputDisabled}
+                                    onNumberClick={(num) => {
+                                        if (selectedCell && grid) {
+                                            placeNumber(selectedCell[0], selectedCell[1], num, grid, duel.duelState, duel.setDuelState);
+                                        }
+                                    }}
+                                    onDeleteClick={() => {
+                                        if (selectedCell && grid) {
+                                            placeNumber(selectedCell[0], selectedCell[1], 0, grid, duel.duelState, duel.setDuelState);
+                                        }
+                                    }}
+                                    onKeypadDragStart={handleKeypadDragStart}
+                                />
                                 <div className="relative h-auto aspect-square">
                                     {gameState === 'duel' && duel.duelState && !duel.duelState.isPaused && currentDuelPlayer && (
                                         <div className="absolute inset-0 transition-all" style={{ transform: 'rotate(-90deg)' }}>

@@ -29,7 +29,7 @@ export const useDuelState = (
     // Duel timers
     useEffect(() => {
         let timerId: number;
-        if (duelState && !duelState.isPaused) {
+        if (duelState && !duelState.isPaused && !duelState.winner) {
             timerId = window.setInterval(() => {
                 setDuelState(d => {
                     if (!d) return null;

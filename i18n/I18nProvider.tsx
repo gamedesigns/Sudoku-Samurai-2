@@ -19,9 +19,9 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const loadTranslations = async () => {
       try {
         const [en, cs, de] = await Promise.all([
-          fetch('/i18n/locales/en.json').then(res => res.json()),
-          fetch('/i18n/locales/cs.json').then(res => res.json()),
-          fetch('/i18n/locales/de.json').then(res => res.json())
+          fetch('./i18n/locales/en.json').then(res => res.json()),
+          fetch('./i18n/locales/cs.json').then(res => res.json()),
+          fetch('./i18n/locales/de.json').then(res => res.json())
         ]);
         setTranslations({ en, cs, de });
       } catch (error) {

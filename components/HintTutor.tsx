@@ -1,14 +1,16 @@
 import React from 'react';
 import { Hint, Theme } from '../types';
 import { useI18n } from '../i18n/I18nProvider';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, X } from 'lucide-react';
 
 interface HintTutorProps {
   hint: Hint;
   theme: Theme;
+  onClose: () => void;
+  onReveal: () => void;
 }
 
-const HintTutor: React.FC<HintTutorProps> = ({ hint, theme }) => {
+const HintTutor: React.FC<HintTutorProps> = ({ hint, theme, onClose, onReveal }) => {
   const { t } = useI18n();
 
   if (!hint || hint.stage !== 'tutor') {
@@ -18,16 +20,33 @@ const HintTutor: React.FC<HintTutorProps> = ({ hint, theme }) => {
   const explanationKey = hint.technique === 'Naked Single' ? 'nakedSingleExplanation' : 'hiddenSingleExplanation';
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-30 p-4 max-w-lg mx-auto`}>
-        <div className={`w-full p-4 rounded-2xl border-2 shadow-2xl ${theme.tutorBg} flex items-start space-x-4 animate-fade-in-up`}>
-            <div className="flex-shrink-0">
-                <Lightbulb className="w-6 h-6 text-green-500" />
-            </div>
-            <div>
-                <h4 className="font-bold text-lg">{t('tutor')}: {t(hint.technique)}</h4>
-                <p className="text-sm mt-1">{t(explanationKey)}</p>
-                <p className="text-xs mt-3 opacity-70">{t('hintNextStep')}</p>
-            </div>
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-end justify-center p-4"
+      onClick={onClose}
+    >
+        <div 
+            className="w-full max-w-lg mx-auto"
+            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing
+        >
+            <button 
+                onClick={onReveal}
+                className={`w-full p-4 rounded-2xl border-2 shadow-2xl text-left ${theme.tutorBg} flex items-start space-x-4 animate-fade-in-up cursor-pointer hover:bg-opacity-80 transition-all`}
+            >
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    className={`absolute top-2 right-2 p-1.5 rounded-full transition-colors ${theme.button}`}
+                >
+                    <X className="w-4 h-4" />
+                </button>
+                <div className="flex-shrink-0 mt-1">
+                    <Lightbulb className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-lg">{t('tutor')}: {t(hint.technique)}</h4>
+                    <p className="text-sm mt-1">{t(explanationKey)}</p>
+                    <p className="text-xs mt-3 font-semibold text-green-700">{t('hintNextStep')}</p>
+                </div>
+            </button>
         </div>
         <style>{`
             @keyframes fade-in-up {

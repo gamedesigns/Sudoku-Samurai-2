@@ -29,6 +29,17 @@ export type Hint = {
     stage: 'nudge' | 'tutor' | 'reveal';
 } | null;
 
+export type ThemeName = 'light' | 'warm' | 'dark';
+
+export interface AppSettings {
+    theme: ThemeName;
+    highlightMode: boolean;
+    language: Language;
+    mistakeChecker: boolean;
+    gameConfig: GameConfig;
+    startFullscreen: boolean;
+}
+
 export interface Theme {
   bg: string;
   text: string;

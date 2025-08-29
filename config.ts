@@ -1,4 +1,4 @@
-import { GameConfig, Language } from './types';
+import { GameConfig, Language, AppSettings as AppSettingsType, ThemeName } from './types';
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
     size: 9,
@@ -6,20 +6,16 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     difficulty: 'Easy',
 };
 
-export interface AppSettings {
-    darkMode: boolean;
-    highlightMode: boolean;
-    language: Language;
-    mistakeChecker: boolean;
-    gameConfig: GameConfig;
-}
+// Re-exporting from types.ts to avoid circular dependencies
+export interface AppSettings extends AppSettingsType {}
 
 export const DEFAULT_SETTINGS: AppSettings = {
-    darkMode: false,
+    theme: 'light',
     highlightMode: true,
     language: 'en',
     mistakeChecker: true,
     gameConfig: DEFAULT_GAME_CONFIG,
+    startFullscreen: true,
 };
 
 export const LANGUAGES: { code: Language; name: string }[] = [

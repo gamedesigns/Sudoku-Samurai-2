@@ -9,6 +9,7 @@
   "highlightMode": "Hervorhebungsmodus",
   "language": "Sprache",
   "lightTheme": "Helles Thema",
+  "warmTheme": "Warmes Thema",
   "darkTheme": "Dunkles Thema",
   "aboutTitle": "Über Sudoku Samurai",
   "aboutText1": "Folgen Sie dem Weg des Samurai mit intuitiver Steuerung, elegantem Design und einem scharfen Fokus auf das klassische Logikrätsel.",
@@ -37,6 +38,7 @@
   "Hidden Single": "Hidden Single",
   "nakedSingleExplanation": "Diese Zelle ist die einzige in ihrer Reihe, Spalte oder ihrem Kasten, in die diese Zahl passen kann, basierend auf den bereits platzierten Zahlen.",
   "hiddenSingleExplanation": "Während andere Zahlen in diese Zelle passen könnten, kann diese Zahl *nur* in diese spezifische Zelle innerhalb ihrer Reihe, Spalte oder ihres Kastens platziert werden.",
-  "hintNextStep": "Klicken Sie erneut auf die Hinweis-Schaltfläche, um die Zahl aufzudecken.",
-  "noPuzzleError": "Für diesen Modus und Schwierigkeitsgrad sind leider noch keine Rätsel verfügbar."
+  "hintNextStep": "Klicken Sie hier, um die Zahl aufzudecken.",
+  "noPuzzleError": "Für diesen Modus und Schwierigkeitsgrad sind leider noch keine Rätsel verfügbar.",
+  "startFullscreen": "Im Vollbildmodus starten"
 }

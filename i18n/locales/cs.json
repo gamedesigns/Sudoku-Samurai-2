@@ -9,6 +9,7 @@
   "highlightMode": "Režim zvýraznění",
   "language": "Jazyk",
   "lightTheme": "Světlý motiv",
+  "warmTheme": "Teplý motiv",
   "darkTheme": "Tmavý motiv",
   "aboutTitle": "O Sudoku Samurai",
   "aboutText1": "Osvojte si cestu samuraje s intuitivním ovládáním, elegantním designem a ostrým zaměřením na klasickou logickou hádanku.",
@@ -37,6 +38,7 @@
   "Hidden Single": "Hidden Single",
   "nakedSingleExplanation": "Tato buňka je jediná ve svém řádku, sloupci nebo boxu, kam se toto číslo může umístit, na základě již umístěných čísel.",
   "hiddenSingleExplanation": "Ačkoli se do této buňky mohou hodit i jiná čísla, toto číslo může jít *pouze* do této konkrétní buňky v rámci svého řádku, sloupce nebo boxu.",
-  "hintNextStep": "Klikněte znovu na tlačítko nápovědy pro odhalení čísla.",
-  "noPuzzleError": "Pro tento režim a obtížnost bohužel zatím nejsou k dispozici žádné hádanky."
+  "hintNextStep": "Klikněte sem pro odhalení čísla.",
+  "noPuzzleError": "Pro tento režim a obtížnost bohužel zatím nejsou k dispozici žádné hádanky.",
+  "startFullscreen": "Spustit na celou obrazovku"
 }

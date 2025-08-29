@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb } from 'lucide-react';
+import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb, Flame } from 'lucide-react';
 
 import { getRandomPuzzle, hasPuzzles } from './constants';
-import { lightTheme, darkTheme } from './themes';
-import { Grid, Position, CellValue, Cell, GameConfig, Hint, Difficulty } from './types';
+import { lightTheme, darkTheme, warmTheme } from './themes';
+import { Grid, Position, CellValue, Cell, GameConfig, Hint, Difficulty, AppSettings, ThemeName } from './types';
 import { generateInitialGrid, checkWin, formatTime, solveSudoku } from './utils';
 import { findHint } from './solver/techniques';
 
@@ -15,7 +15,7 @@ import HintTutor from './components/HintTutor';
 
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
-import { DEFAULT_SETTINGS, LANGUAGES, AppSettings, GAME_MODES, DEFAULT_GAME_CONFIG } from './config';
+import { DEFAULT_SETTINGS, LANGUAGES, GAME_MODES, DEFAULT_GAME_CONFIG } from './config';
 
 
 type GameState = 'new' | 'inprogress' | 'completed';
@@ -23,7 +23,7 @@ type InputMode = 'normal' | 'notes';
 
 const Game: React.FC = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
-  const { darkMode, highlightMode, language, mistakeChecker, gameConfig } = settings;
+  const { theme: themeName, highlightMode, language, mistakeChecker, gameConfig, startFullscreen } = settings;
   const { t, setLang, lang } = useI18n();
 
   useEffect(() => {
@@ -51,7 +51,8 @@ const Game: React.FC = () => {
   
   const [tempGameConfig, setTempGameConfig] = useState<GameConfig>(gameConfig);
 
-  const theme = darkMode ? darkTheme : lightTheme;
+  const themes = { light: lightTheme, warm: warmTheme, dark: darkTheme };
+  const theme = themes[themeName];
 
   useEffect(() => {
     let timerId: number;
@@ -66,10 +67,15 @@ const Game: React.FC = () => {
   }, [gameState]);
   
   useEffect(() => {
-    startNewGame(gameConfig);
+    startNewGame(gameConfig, false); // Don't request fullscreen on initial load
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const startNewGame = useCallback((newConfig: GameConfig) => {
+  const startNewGame = useCallback((newConfig: GameConfig, requestFS: boolean = true) => {
+    if (requestFS && startFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    }
     const puzzle = getRandomPuzzle(newConfig);
     if (!puzzle) {
         console.error("No puzzle found for this configuration:", newConfig);
@@ -88,7 +94,7 @@ const Game: React.FC = () => {
     setNewGameOpen(false);
     setIncorrectCells(new Set());
     setHint(null);
-  }, [setSettings, t]);
+  }, [setSettings, t, startFullscreen]);
 
   const handleCellClick = useCallback((row: number, col: number) => {
     if (!grid || grid[row][col].isOriginal) return;
@@ -156,37 +162,38 @@ const Game: React.FC = () => {
     setGrid(newGrid);
     checkMistakes(newGrid);
   }, [selectedCell, grid, gameState, checkMistakes]);
+
+  const revealHint = useCallback(() => {
+    if (!hint || !grid || !solvedGrid) return;
+
+    const [row, col] = hint.position;
+    const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
+    newGrid[row][col].value = solvedGrid[row][col].value;
+    newGrid[row][col].notes.clear();
+    setGrid(newGrid);
+    checkMistakes(newGrid);
+    setHint(null);
+    if (checkWin(newGrid, gameConfig)) {
+        setGameState('completed');
+        setWinModalOpen(true);
+    }
+  }, [hint, grid, solvedGrid, checkMistakes, gameConfig]);
   
   const handleHintClick = useCallback(() => {
-    if (gameState !== 'inprogress' || !solvedGrid || !grid) return;
+    if (gameState !== 'inprogress' || !grid) return;
 
-    if (hint) {
-        if (hint.stage === 'nudge') {
-            setHint({ ...hint, stage: 'tutor'});
-        } else if (hint.stage === 'tutor') {
-            const [row, col] = hint.position;
-            const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
-            newGrid[row][col].value = solvedGrid[row][col].value;
-            newGrid[row][col].notes.clear();
-            setGrid(newGrid);
-            checkMistakes(newGrid);
-            setHint(null);
-            if (checkWin(newGrid, gameConfig)) {
-                setGameState('completed');
-                setWinModalOpen(true);
-            }
-        }
+    if (hint && hint.stage === 'nudge') {
+        setHint({ ...hint, stage: 'tutor'});
     } else {
         const foundHint = findHint(grid, gameConfig);
         if (foundHint) {
             setHint({ ...foundHint, stage: 'nudge' });
             setSelectedCell(foundHint.position);
         } else {
-            // No hint found (or maybe show a message)
             console.log("No simple hint available.");
         }
     }
-  }, [gameState, solvedGrid, grid, hint, checkMistakes, gameConfig]);
+  }, [gameState, grid, hint, gameConfig]);
 
   const closeAllModals = () => {
       setSettingsOpen(false);
@@ -219,11 +226,11 @@ const Game: React.FC = () => {
 
   return (
     <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text}`}>
-      <div className="relative max-w-lg mx-auto flex flex-col min-h-screen">
+      <div className="relative max-w-5xl mx-auto flex flex-col min-h-screen">
         <Header theme={theme} isMenuOpen={isMenuOpen} onMenuToggle={() => setMenuOpen(!isMenuOpen)} />
 
         {isMenuOpen && (
-          <div className={`absolute top-20 right-4 ${theme.cardBg} rounded-2xl shadow-xl z-40 border-2 ${theme.border} overflow-hidden w-48`}>
+          <div className={`absolute top-20 right-4 ${theme.cardBg} rounded-2xl shadow-xl z-50 border-2 ${theme.border} overflow-hidden w-48`}>
              <button
               onClick={() => { setTempGameConfig(gameConfig); setNewGameOpen(true); setMenuOpen(false); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
@@ -262,39 +269,43 @@ const Game: React.FC = () => {
           </div>
         )}
 
-        <main className="flex-grow flex flex-col justify-center p-2 sm:p-4 space-y-4">
-          <div className="flex justify-between items-center px-2">
+        <main className="flex-grow flex flex-col justify-center p-2 sm:p-4">
+          <div className="flex justify-between items-center px-2 max-w-md mx-auto w-full">
             <div className="text-sm font-medium">{t(gameConfig.mode)} • {t(gameConfig.difficulty.toLowerCase())}</div>
             <div className="text-lg font-semibold tabular-nums">{formatTime(time)}</div>
           </div>
-          <SudokuBoard 
-            grid={grid}
-            gameConfig={gameConfig}
-            selectedCell={selectedCell}
-            theme={theme}
-            highlightMode={highlightMode}
-            onCellClick={handleCellClick}
-            incorrectCells={incorrectCells}
-            hint={hint}
-          />
-          <div className="flex flex-col items-center space-y-4">
-            <ModeToggle />
-            <div className="flex items-center w-full max-w-md mx-auto space-x-2 sm:space-x-3">
-              <NumberPad
-                theme={theme}
-                gameConfig={gameConfig}
-                onNumberClick={handleNumberClick}
-                onDeleteClick={handleDeleteClick}
-              />
-              <button onClick={handleHintClick} className={`h-full aspect-square rounded-lg sm:rounded-xl font-bold transition-all duration-200 flex items-center justify-center ${theme.button} ${theme.text} hover:scale-105 active:scale-95`}>
-                <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7" />
-              </button>
+          <div className="game-layout flex flex-col items-center flex-grow justify-center">
+            <div className="board-wrapper w-full max-w-md">
+                <SudokuBoard 
+                    grid={grid}
+                    gameConfig={gameConfig}
+                    selectedCell={selectedCell}
+                    theme={theme}
+                    highlightMode={highlightMode}
+                    onCellClick={handleCellClick}
+                    incorrectCells={incorrectCells}
+                    hint={hint}
+                />
+            </div>
+            <div className="controls-wrapper mt-4 w-full max-w-md flex flex-col items-center space-y-4">
+              <ModeToggle />
+              <div className="flex items-stretch w-full space-x-2 sm:space-x-3">
+                <NumberPad
+                  theme={theme}
+                  gameConfig={gameConfig}
+                  onNumberClick={handleNumberClick}
+                  onDeleteClick={handleDeleteClick}
+                />
+                <button onClick={handleHintClick} className={`h-auto aspect-square rounded-lg sm:rounded-xl font-bold transition-all duration-200 flex items-center justify-center ${theme.button} ${theme.text} hover:scale-105 active:scale-95`}>
+                  <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7" />
+                </button>
+              </div>
             </div>
           </div>
         </main>
         
         {hint && hint.stage === 'tutor' && (
-            <HintTutor hint={hint} theme={theme} />
+            <HintTutor hint={hint} theme={theme} onClose={() => setHint(null)} onReveal={revealHint} />
         )}
 
         <Modal show={isSettingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings')} theme={theme}>
@@ -317,11 +328,20 @@ const Game: React.FC = () => {
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${mistakeChecker ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
+             <div className="flex justify-between items-center">
+              <span className="font-medium">{t('startFullscreen')}</span>
+              <button
+                onClick={() => setSettings(s => ({ ...s, startFullscreen: !s.startFullscreen }))}
+                className={`w-12 h-6 rounded-full transition-colors ${startFullscreen ? theme.toggleBgActive : theme.toggleBg} relative`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${startFullscreen ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
             <div>
               <span className="font-medium block mb-2">{t('language')}</span>
               <div className="flex space-x-2">
                 {LANGUAGES.map(({ code, name }) => (
-                    <button key={code} onClick={() => setSettings(s => ({...s, language: code}))} className={`w-full p-2 text-sm rounded-lg font-semibold border-2 transition-colors ${language === code ? 'border-red-500 bg-red-50' : `border-transparent ${theme.button}`}`}>
+                    <button key={code} onClick={() => setSettings(s => ({...s, language: code}))} className={`w-full p-2 text-sm rounded-lg font-semibold border-2 transition-colors ${language === code ? `border-blue-500 ${lightTheme.cellHighlight} ${lightTheme.userText}` : `border-transparent ${theme.button}`}`}>
                         {name}
                     </button>
                 ))}
@@ -333,18 +353,25 @@ const Game: React.FC = () => {
         <Modal show={isThemesOpen} onClose={() => setThemesOpen(false)} title={t('themes')} theme={theme}>
           <div className="space-y-3">
             <button
-              onClick={() => { setSettings(s => ({...s, darkMode: false})); closeAllModals(); }}
-              className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${!darkMode ? 'border-red-500 bg-red-50' : `border-transparent ${theme.button}`}`}
+              onClick={() => { setSettings(s => ({...s, theme: 'light'})); closeAllModals(); }}
+              className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'light' ? `border-blue-500 ${lightTheme.cellHighlight}` : `border-transparent ${theme.button}`}`}
             >
-              <Sun className={`w-5 h-5 ${!darkMode ? 'text-red-500' : theme.text}`} />
-              <span className={`${!darkMode ? 'text-red-700' : theme.text}`}>{t('lightTheme')}</span>
+              <Sun className={`w-5 h-5 ${themeName === 'light' ? 'text-blue-500' : theme.text}`} />
+              <span className={`${themeName === 'light' ? lightTheme.userText : theme.text}`}>{t('lightTheme')}</span>
             </button>
             <button
-              onClick={() => { setSettings(s => ({...s, darkMode: true})); closeAllModals(); }}
-              className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${darkMode ? 'border-blue-500 bg-blue-900/20' : `border-transparent ${theme.button}`}`}
+              onClick={() => { setSettings(s => ({...s, theme: 'warm'})); closeAllModals(); }}
+              className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'warm' ? `border-red-500 ${warmTheme.cellHighlight}` : `border-transparent ${theme.button}`}`}
             >
-              <Moon className={`w-5 h-5 ${darkMode ? 'text-blue-500' : theme.text}`} />
-              <span className={`${darkMode ? 'text-blue-300' : theme.text}`}>{t('darkTheme')}</span>
+              <Flame className={`w-5 h-5 ${themeName === 'warm' ? 'text-red-500' : theme.text}`} />
+              <span className={`${themeName === 'warm' ? warmTheme.userText : theme.text}`}>{t('warmTheme')}</span>
+            </button>
+            <button
+              onClick={() => { setSettings(s => ({...s, theme: 'dark'})); closeAllModals(); }}
+              className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'dark' ? 'border-blue-500 bg-blue-900/20' : `border-transparent ${theme.button}`}`}
+            >
+              <Moon className={`w-5 h-5 ${themeName === 'dark' ? 'text-blue-500' : theme.text}`} />
+              <span className={`${themeName === 'dark' ? 'text-blue-300' : theme.text}`}>{t('darkTheme')}</span>
             </button>
           </div>
         </Modal>
@@ -352,7 +379,7 @@ const Game: React.FC = () => {
         <Modal show={isAboutOpen} onClose={() => setAboutOpen(false)} title={t('aboutTitle')} theme={theme}>
           <div className="space-y-4 text-sm">
             <p>{t('aboutText1')}</p>
-            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.4.0'})}</p>
+            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.5.0'})}</p>
           </div>
         </Modal>
 
@@ -378,7 +405,7 @@ const Game: React.FC = () => {
                                 difficulty: firstAvailableDifficulty || tempGameConfig.difficulty
                             });
                         }}
-                        className={`w-full p-3 rounded-lg border-2 ${theme.border} ${theme.cardBg} focus:outline-none focus:ring-2 focus:ring-red-400`}
+                        className={`w-full p-3 rounded-lg border-2 ${theme.border} ${theme.cardBg} focus:outline-none focus:ring-2 focus:ring-blue-400`}
                     >
                         {GAME_MODES.map(gm => (
                             <option key={`${gm.mode}-${gm.size}`} value={`${gm.mode}-${gm.size}`}>{t(gm.nameKey)}</option>
@@ -405,7 +432,7 @@ const Game: React.FC = () => {
                                     disabled={!isAvailable}
                                     className={`p-3 rounded-lg font-bold transition-colors border-2 ${
                                         tempGameConfig.difficulty === diff 
-                                            ? 'bg-red-500 text-white border-red-500' 
+                                            ? 'bg-blue-600 text-white border-blue-600' 
                                             : isAvailable 
                                                 ? `${theme.button} border-transparent`
                                                 : `${theme.button} border-transparent opacity-40 cursor-not-allowed`

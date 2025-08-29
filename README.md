@@ -1,6 +1,6 @@
 # Sudoku Samurai 侍
 
-**Version 0.4.0**
+**Version 0.5.0**
 
 ![Sudoku Samurai Banner](https://img.shields.io/badge/Sudoku-Samurai-red?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMgM2g3djdoLTd6Ii8+PHBhdGggZD0iTTE0IDNoN3Y3aC03eiIvPjxwYXRoIGQ0iTTE0IDE0aDdoN3Y3aC03eiIvPjxwYXRoIGQ0iTTMgMTRoN3Y3aC03eiIvPjwvc3ZnPg==)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -20,7 +20,7 @@ Welcome to Sudoku Samurai, a modern take on the classic logic puzzle. This appli
 -   **Responsive & Dynamic UI**: The board and controls adapt perfectly to any grid size and screen.
 -   **Multiple Languages**: Play in English, Czech, or German.
 -   **Persistent Settings**: Your preferences for theme, language, and highlighting are saved in your browser.
--   **Elegant Theming**: Switch between a beautiful light theme (Amber) and a sleek dark theme.
+-   **Elegant Theming**: Switch between a crisp Light theme, a cozy Warm theme, and a sleek Dark theme.
 
 ## 🚀 Roadmap & Future Features
 

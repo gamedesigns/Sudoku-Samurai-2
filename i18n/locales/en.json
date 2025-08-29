@@ -9,6 +9,7 @@
   "highlightMode": "Highlight Mode",
   "language": "Language",
   "lightTheme": "Light Theme",
+  "warmTheme": "Warm Theme",
   "darkTheme": "Dark Theme",
   "aboutTitle": "About Sudoku Samurai",
   "aboutText1": "Embrace the way of the samurai with intuitive controls, elegant design, and a sharp focus on the classic logic puzzle.",
@@ -37,6 +38,7 @@
   "Hidden Single": "Hidden Single",
   "nakedSingleExplanation": "This cell is the only one in its row, column, or box where this number can possibly go, based on the numbers already placed.",
   "hiddenSingleExplanation": "While other numbers might fit in this cell, this number can *only* go in this specific cell within its row, column, or box.",
-  "hintNextStep": "Click the hint button again to reveal the number.",
-  "noPuzzleError": "Sorry, no puzzles are available for this mode and difficulty yet."
+  "hintNextStep": "Click here to reveal the number.",
+  "noPuzzleError": "Sorry, no puzzles are available for this mode and difficulty yet.",
+  "startFullscreen": "Start in Fullscreen"
 }

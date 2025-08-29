@@ -63,10 +63,11 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
     const fontClasses = size === 9 ? 'text-xl sm:text-2xl' : size === 6 ? 'text-lg sm:text-xl' : 'text-base sm:text-lg';
 
     const borderClasses = `
-      ${(col + 1) % boxCols === 0 && col !== size - 1 ? `border-r-2 ${theme.borderThick}` : `border-r ${theme.border}`}
-      ${(row + 1) % boxRows === 0 && row !== size - 1 ? `border-b-2 ${theme.borderThick}` : `border-b ${theme.border}`}
-      ${col === 0 ? `border-l-2 ${theme.borderThick}` : `border-l ${theme.border}`}
-      ${row === 0 ? `border-t-2 ${theme.borderThick}` : `border-t ${theme.border}`}
+      border-t border-l ${theme.border}
+      ${(col + 1) % boxCols === 0 ? `border-r-2 ${theme.borderThick}` : `border-r ${theme.border}`}
+      ${(row + 1) % boxRows === 0 ? `border-b-2 ${theme.borderThick}` : `border-b ${theme.border}`}
+      ${col === 0 ? `border-l-2 ${theme.borderThick}`: ''}
+      ${row === 0 ? `border-t-2 ${theme.borderThick}`: ''}
     `;
 
     let stateClasses = '';
@@ -75,11 +76,13 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
     } else if (isSelected) {
       stateClasses = `${theme.cellSelected} text-white shadow-lg scale-105 z-10`;
     } else if (isSameNumber) {
-      stateClasses = `${theme.cellSelected} bg-opacity-70`;
+      stateClasses = `${theme.cellHighlight}`;
     } else if (isHighlighted) {
       stateClasses = `${theme.cellHighlight}`;
     } else if (isDiagonal) {
         stateClasses = `${theme.cellHighlight} bg-opacity-50`
+    } else if (value === 0) {
+      stateClasses = theme.cellEmpty;
     } else {
       stateClasses = `${theme.cellBg}`;
     }
@@ -100,7 +103,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
   };
 
   return (
-    <div className={`w-full max-w-md mx-auto ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-4 border-2 ${theme.borderThick}`}>
+    <div className={`w-full mx-auto ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-4 border-2 ${theme.borderThick}`}>
       <div 
         className="grid bg-transparent"
         style={{ gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))` }}

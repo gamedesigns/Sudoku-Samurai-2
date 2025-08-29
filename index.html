@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -16,6 +15,30 @@
   }
 }
 </script>
+<style>
+  /* Apply layout for landscape orientation on devices like phones */
+  @media (orientation: landscape) and (max-height: 600px) {
+    .game-layout {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem; /* 24px */
+      width: 100%;
+    }
+    .board-wrapper {
+      flex: 0 1 auto;
+      width: auto;
+      max-width: calc(100vh - 7rem); /* Adjust based on header/padding */
+      margin: 0;
+    }
+    .controls-wrapper {
+      flex: 1 1 auto;
+      margin-top: 0;
+      width: auto;
+      max-width: 280px;
+    }
+  }
+</style>
 </head>
   <body>
     <div id="root"></div>

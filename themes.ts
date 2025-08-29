@@ -1,6 +1,30 @@
 import { Theme } from './types';
 
 export const lightTheme: Theme = {
+  bg: 'bg-slate-100',
+  text: 'text-slate-800',
+  cardBg: 'bg-white',
+  cellBg: 'bg-white',
+  cellEmpty: 'bg-slate-50',
+  cellSelected: 'bg-blue-500',
+  cellHighlight: 'bg-blue-100',
+  border: 'border-slate-300',
+  borderThick: 'border-slate-500',
+  button: 'bg-slate-200 hover:bg-slate-300',
+  numberButton: 'bg-blue-600 hover:bg-blue-700',
+  modal: 'bg-white border-slate-300',
+  originalText: 'text-slate-900',
+  userText: 'text-blue-700',
+  toggleBg: 'bg-slate-300',
+  toggleBgActive: 'bg-blue-500',
+  noteText: 'text-slate-600',
+  cellErrorBg: 'bg-red-200',
+  cellErrorText: 'text-red-700 font-bold',
+  cellHintBorder: 'border-green-500',
+  tutorBg: 'bg-green-100 border-green-300',
+};
+
+export const warmTheme: Theme = {
   bg: 'bg-amber-50',
   text: 'text-gray-800',
   cardBg: 'bg-white',
@@ -13,9 +37,9 @@ export const lightTheme: Theme = {
   button: 'bg-amber-200 hover:bg-amber-300',
   numberButton: 'bg-red-500 hover:bg-red-600',
   modal: 'bg-white border-amber-300',
-  originalText: 'text-gray-900',
-  userText: 'text-blue-600',
-  toggleBg: 'bg-gray-300',
+  originalText: 'text-gray-900 font-black',
+  userText: 'text-red-700',
+  toggleBg: 'bg-amber-200',
   toggleBgActive: 'bg-red-500',
   noteText: 'text-amber-800',
   cellErrorBg: 'bg-red-200',

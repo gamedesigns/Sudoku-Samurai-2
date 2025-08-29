@@ -1,16 +1,35 @@
 import React from 'react';
-import { CellValue, GameConfig, Theme } from '../types';
+import { CellValue, GameConfig, Theme, DisplayMode } from '../types';
+import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants';
 
 interface NumberPadProps {
   theme: Theme;
   gameConfig: GameConfig;
+  displayMode: DisplayMode;
   onNumberClick: (num: CellValue) => void;
   onDeleteClick: () => void;
+  onKeypadDragStart: (num: CellValue) => void;
 }
 
-const NumberPad: React.FC<NumberPadProps> = ({ theme, gameConfig, onNumberClick, onDeleteClick }) => {
+const NumberPad: React.FC<NumberPadProps> = ({ theme, gameConfig, displayMode, onNumberClick, onDeleteClick, onKeypadDragStart }) => {
   const { size } = gameConfig;
   const gridCols = size === 9 ? 'grid-cols-5' : size === 6 ? 'grid-cols-4' : 'grid-cols-3';
+
+  const renderButtonContent = (number: number) => {
+    switch (displayMode) {
+        case 'color':
+            return <div className={`w-3/5 h-3/5 rounded-full ${COLOR_MAP[number]}`} />;
+        case 'letter':
+            return LETTER_MAP[number];
+        case 'japanese':
+            return JAPANESE_NUMBER_MAP[number];
+        case 'kids':
+            const Icon = KIDS_ICON_MAP[number];
+            return <Icon className="w-3/4 h-3/4" />;
+        default:
+            return number;
+    }
+  };
 
   return (
     <div className='w-full'>
@@ -20,10 +39,12 @@ const NumberPad: React.FC<NumberPadProps> = ({ theme, gameConfig, onNumberClick,
             <button
               key={number}
               onClick={() => onNumberClick(number as CellValue)}
+              onMouseDown={(e) => { e.preventDefault(); onKeypadDragStart(number as CellValue); }}
+              onTouchStart={(e) => { onKeypadDragStart(number as CellValue); }}
               className={`aspect-square rounded-lg sm:rounded-xl font-bold text-xl sm:text-2xl transition-all duration-200 flex items-center justify-center
                 ${theme.button} ${theme.text} hover:scale-105 active:scale-95`}
             >
-              {number}
+                {renderButtonContent(number)}
             </button>
           ))}
           <button

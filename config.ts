@@ -1,4 +1,4 @@
-import { GameConfig, Language, AppSettings as AppSettingsType, ThemeName, SoundEvent, MusicProfile, Difficulty } from './types';
+import { GameConfig, Language, AppSettings as AppSettingsType, ThemeName, SoundEvent, MusicProfile, Difficulty, DisplayMode, Player } from './types';
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
     size: 9,
@@ -20,6 +20,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     sfxVolume: 0.6,
     isMuted: false,
     musicProfile: 'Level',
+    phistomefelRing: false,
+    displayMode: 'number',
+    swooshInput: true,
 };
 
 export const LANGUAGES: { code: Language; name: string }[] = [
@@ -33,9 +36,17 @@ export const GAME_MODES: { nameKey: string, mode: GameConfig['mode'], size: Game
     { nameKey: 'classic6x6', mode: 'Classic', size: 6 },
     { nameKey: 'classic9x9', mode: 'Classic', size: 9 },
     { nameKey: 'xsudoku9x9', mode: 'X-Sudoku', size: 9 },
+    { nameKey: 'hypersudoku9x9', mode: 'Hyper Sudoku', size: 9 },
 ];
 
 export const MUSIC_PROFILES: MusicProfile[] = ['Calm', 'Powerful', 'Level', 'Mixed'];
+
+export const PLAYER_COLORS: Player[] = [
+    { id: 1, nameKey: 'player_red', color: 'red', score: 0 },
+    { id: 2, nameKey: 'player_blue', color: 'blue', score: 0 },
+    { id: 3, nameKey: 'player_green', color: 'green', score: 0 },
+    { id: 4, nameKey: 'player_violet', color: 'violet', score: 0 },
+];
 
 // NOTE: Add paths to your actual audio files here.
 // The system supports multiple files for SFX (randomly chosen) and playlists for music.

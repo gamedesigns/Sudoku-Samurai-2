@@ -5,6 +5,7 @@ export type Cell = {
   value: CellValue;
   notes: Set<number>;
   isOriginal: boolean;
+  placedBy?: PlayerColor | null; // Added for Duel Mode
 };
 
 export type Grid = Cell[][];
@@ -12,7 +13,7 @@ export type Grid = Cell[][];
 export type Difficulty = 'Novice' | 'Easy' | 'Medium' | 'Hard';
 export type Language = 'en' | 'cs' | 'de';
 
-export type GameMode = 'Classic' | 'X-Sudoku';
+export type GameMode = 'Classic' | 'X-Sudoku' | 'Hyper Sudoku' | 'Duel';
 export type GridSize = 4 | 6 | 9;
 
 export interface GameConfig {
@@ -31,9 +32,39 @@ export type Hint = {
 
 export type ThemeName = 'light' | 'warm' | 'dark';
 
+export type DisplayMode = 'number' | 'color' | 'letter' | 'japanese' | 'kids';
+
 export type SoundEvent = 'placeNumber' | 'delete' | 'error' | 'click';
 
 export type MusicProfile = 'Calm' | 'Powerful' | 'Level' | 'Mixed';
+
+// --- Multiplayer Types ---
+export type PlayerColor = 'red' | 'blue' | 'green' | 'violet';
+export interface Player {
+    id: number;
+    nameKey: string;
+    color: PlayerColor;
+    score: number;
+}
+export interface MultiplayerConfig {
+    playerCount: 2 | 3 | 4;
+    puzzleSize: 6 | 9;
+    difficulty: Difficulty;
+    players: Player[];
+    masterTimer: number; // in seconds
+    turnTimer: number; // in seconds
+}
+
+export interface DuelState {
+    players: Player[];
+    currentPlayerIndex: number;
+    masterTimeLeft: number;
+    turnTimeLeft: number;
+    isPaused: boolean;
+    winner: Player | null;
+}
+// --- End Multiplayer Types ---
+
 
 export interface AppSettings {
     theme: ThemeName;
@@ -46,6 +77,9 @@ export interface AppSettings {
     sfxVolume: number;
     isMuted: boolean;
     musicProfile: MusicProfile;
+    phistomefelRing: boolean;
+    displayMode: DisplayMode;
+    swooshInput: boolean;
 }
 
 export interface Theme {
@@ -56,6 +90,8 @@ export interface Theme {
   cellEmpty: string;
   cellSelected: string;
   cellHighlight: string;
+  cellDragTarget: string;
+  cellBeingMoved: string;
   border: string;
   borderThick: string;
   button: string;
@@ -70,4 +106,6 @@ export interface Theme {
   cellErrorText: string;
   cellHintBorder: string;
   tutorBg: string;
+  phistoRingCornerBg: string;
+  phistoRingCenterBg: string;
 }

@@ -8,6 +8,8 @@ export const lightTheme: Theme = {
   cellEmpty: 'bg-slate-50',
   cellSelected: 'bg-blue-500',
   cellHighlight: 'bg-blue-100',
+  cellDragTarget: 'bg-green-300',
+  cellBeingMoved: 'bg-green-100',
   border: 'border-slate-300',
   borderThick: 'border-slate-500',
   button: 'bg-slate-200 hover:bg-slate-300',
@@ -22,6 +24,8 @@ export const lightTheme: Theme = {
   cellErrorText: 'text-red-700 font-bold',
   cellHintBorder: 'border-green-500',
   tutorBg: 'bg-green-100 border-green-300',
+  phistoRingCornerBg: 'bg-purple-100',
+  phistoRingCenterBg: 'bg-orange-100',
 };
 
 export const warmTheme: Theme = {
@@ -32,6 +36,8 @@ export const warmTheme: Theme = {
   cellEmpty: 'bg-amber-100',
   cellSelected: 'bg-red-400',
   cellHighlight: 'bg-red-100',
+  cellDragTarget: 'bg-green-300',
+  cellBeingMoved: 'bg-green-100',
   border: 'border-amber-300',
   borderThick: 'border-amber-600',
   button: 'bg-amber-200 hover:bg-amber-300',
@@ -46,6 +52,8 @@ export const warmTheme: Theme = {
   cellErrorText: 'text-red-700 font-bold',
   cellHintBorder: 'border-green-500',
   tutorBg: 'bg-green-100 border-green-300',
+  phistoRingCornerBg: 'bg-purple-100',
+  phistoRingCenterBg: 'bg-orange-100',
 };
 
 export const darkTheme: Theme = {
@@ -56,6 +64,8 @@ export const darkTheme: Theme = {
   cellEmpty: 'bg-gray-600',
   cellSelected: 'bg-blue-600',
   cellHighlight: 'bg-blue-900',
+  cellDragTarget: 'bg-green-700',
+  cellBeingMoved: 'bg-green-900',
   border: 'border-gray-500',
   borderThick: 'border-gray-300',
   button: 'bg-gray-700 hover:bg-gray-600',
@@ -70,4 +80,6 @@ export const darkTheme: Theme = {
   cellErrorText: 'text-red-400 font-bold',
   cellHintBorder: 'border-green-400',
   tutorBg: 'bg-green-900/50 border-green-700',
+  phistoRingCornerBg: 'bg-purple-900/40',
+  phistoRingCenterBg: 'bg-orange-900/40',
 };

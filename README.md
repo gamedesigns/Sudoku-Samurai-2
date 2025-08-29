@@ -1,6 +1,6 @@
 # Sudoku Samurai 侍
 
-**Version 0.7.0**
+**Version 1.5.0**
 
 ![Sudoku Samurai Banner](https://img.shields.io/badge/Sudoku-Samurai-red?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMgM2g3djdoLTd6Ii8+PHBhdGggZD0iTTE0IDNoN3Y3aC03eiIvPjxwYXRoIGQ0iTTE0IDE0aDdoN3Y3aC03eiIvPjxwYXRoIGQ0iTTMgMTRoN3Y3aC03eiIvPjwvc3ZnPg==)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -9,11 +9,20 @@ Welcome to Sudoku Samurai, a modern take on the classic logic puzzle. This appli
 
 ## ✨ Features
 
--   **Multiple Game Modes**:
+-   **Multiple Game Modes & Variants**:
     -   **Classic Sudoku**: The timeless 9x9 grid.
     -   **Katana Kutsurogi (Relaxation)**: Quick and easy 4x4 and 6x6 grids.
     -   **X-Sudoku**: A variant where the main diagonals must also contain unique numbers.
+    -   **Hyper Sudoku**: Four extra 3x3 regions in the center of the grid add a new layer of challenge.
+    -   **Duel Mode (Pass-and-Play Setup)**: Configure a competitive match for 2-4 players.
+-   **Advanced Input System**:
+    -   **Intuitive Combined Placing**: Seamlessly combines cell-first (precision) and digit-first (speed) input methods.
+    -   **"Swoosh" Input**: Drag numbers from the keypad directly onto the board.
+    -   **Drag-to-Move**: Move a number you've placed by dragging it to a new cell.
+    -   **Drag-to-Delete**: Delete a number by dragging it off the board.
+-   **Switchable Display Modes**: Play any classic-style puzzle with **Numbers**, **Colors**, **Letters**, **Japanese Numbers (Kanji)**, or **Kids Mode (Icons)**.
 -   **Technique Tutor Hint System**: A multi-stage hint system that teaches you *how* to solve the puzzle, identifying techniques like "Naked Singles" and "Hidden Singles".
+-   **Phistomefel Ring Overlay**: A unique visual aid for advanced players to spot complex patterns on 9x9 grids.
 -   **Advanced Audio System**: Choose a music profile (Calm, Powerful, Level, or Mixed) to enjoy shuffled playlists of background music, victory fanfares, and dynamic, alternating sound effects for all actions.
 -   **Mistake Checker**: Get instant feedback on incorrect number placements.
 -   **Pencil Marks (Notes)**: Toggle to "Notes" mode to jot down potential numbers in a cell.
@@ -29,36 +38,30 @@ This project aims to evolve into a premier Sudoku experience. The following feat
 
 -   **More Game Modes**:
     -   **Samurai Siege**: A challenging 5-grid overlapping puzzle.
-    -   **The Duel**: A competitive two-player mode.
+    -   **The Duel**: Full gameplay implementation for the competitive two-player mode.
     -   **Elemental Sudoku**: Puzzles with unique cell constraints.
--   **More Variants**: A section to play popular Sudoku variants like Hyper Sudoku, Jigsaw Sudoku, and Killer Sudoku.
--   **Advanced Controls**: A novel "Swoosh" input method for faster number entry.
+-   **More Variants**: A section to play popular Sudoku variants like Jigsaw Sudoku and Killer Sudoku.
 
 ## 🛠️ Tech Stack
 
 -   **Frontend**: [React](https://reactjs.org/) & [TypeScript](https://www.typescriptlang.org/)
 -   **Audio**: Web Audio API
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/) (via Play CDN)
 -   **Icons**: [Lucide React](https://lucide.dev/)
 
 ##  Quick Start
 
-To run this project locally:
+This project is designed to run in a no-build-step environment like the Google AI Studio or a simple local server.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/sudoku-samurai.git
-    cd sudoku-samurai
+    git clone https://github.com/gamedesigns/Sudoku-Samurai-2.git
+    cd Sudoku-Samurai-2
     ```
-2.  **Install dependencies:**
-    *(Assuming a Node.js environment)*
-    ```bash
-    npm install
-    ```
-3.  **Run the development server:**
-    ```bash
-    npm start
-    ```
+2.  **Run with a local server:**
+    The easiest way is to use the **Live Server** extension in VS Code.
+    -   Install the "Live Server" extension by Ritwick Dey.
+    -   Click the "Go Live" button in the bottom-right corner of VS Code.
 
 ## ✍️ Author
 

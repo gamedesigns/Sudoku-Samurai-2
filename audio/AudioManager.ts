@@ -110,25 +110,25 @@ class AudioManager {
             case 'placeNumber':
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(440, now);
-                gain.gain.setValueAtTime(1, now);
+                gain.gain.setValueAtTime(0.2, now); // Reduced volume
                 gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
                 break;
             case 'delete':
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(220, now);
-                gain.gain.setValueAtTime(0.8, now);
+                gain.gain.setValueAtTime(0.15, now); // Reduced volume
                 gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
                 break;
             case 'error':
                  oscillator.type = 'square';
                  oscillator.frequency.setValueAtTime(150, now);
-                 gain.gain.setValueAtTime(0.5, now);
+                 gain.gain.setValueAtTime(0.3, now); // Reduced volume
                  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
                 break;
             case 'click':
                  oscillator.type = 'triangle';
                  oscillator.frequency.setValueAtTime(880, now);
-                 gain.gain.setValueAtTime(0.5, now);
+                 gain.gain.setValueAtTime(0.25, now); // Reduced volume
                  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
                 break;
         }

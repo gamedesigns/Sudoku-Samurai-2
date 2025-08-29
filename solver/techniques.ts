@@ -39,6 +39,25 @@ const getCandidates = (grid: Grid, row: number, col: number, config: GameConfig)
         }
     }
 
+    // Eliminate from hyper regions for Hyper Sudoku
+    if (config.mode === 'Hyper Sudoku' && size === 9) {
+        const hyperRegions = [
+            {rs:1, re:3, cs:1, ce:3},
+            {rs:1, re:3, cs:5, ce:7},
+            {rs:5, re:7, cs:1, ce:3},
+            {rs:5, re:7, cs:5, ce:7},
+        ];
+        for (const region of hyperRegions) {
+            if (row >= region.rs && row <= region.re && col >= region.cs && col <= region.ce) {
+                for (let r = region.rs; r <= region.re; r++) {
+                    for (let c = region.cs; c <= region.ce; c++) {
+                        candidates.delete(grid[r][c].value);
+                    }
+                }
+            }
+        }
+    }
+
     return candidates;
 };
 

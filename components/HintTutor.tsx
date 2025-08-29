@@ -25,19 +25,13 @@ const HintTutor: React.FC<HintTutorProps> = ({ hint, theme, onClose, onReveal })
       onClick={onClose}
     >
         <div 
-            className="w-full max-w-lg mx-auto"
-            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing
+            className="w-full max-w-lg mx-auto relative animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the whole overlay
         >
-            <button 
+            <div 
                 onClick={onReveal}
-                className={`w-full p-4 rounded-2xl border-2 shadow-2xl text-left ${theme.tutorBg} flex items-start space-x-4 animate-fade-in-up cursor-pointer hover:bg-opacity-80 transition-all`}
+                className={`w-full p-4 pl-5 pr-10 rounded-2xl border-2 shadow-2xl text-left ${theme.tutorBg} flex items-start space-x-4 cursor-pointer hover:bg-opacity-80 transition-all`}
             >
-                <button 
-                    onClick={(e) => { e.stopPropagation(); onClose(); }}
-                    className={`absolute top-2 right-2 p-1.5 rounded-full transition-colors ${theme.button}`}
-                >
-                    <X className="w-4 h-4" />
-                </button>
                 <div className="flex-shrink-0 mt-1">
                     <Lightbulb className="w-6 h-6 text-green-500" />
                 </div>
@@ -46,6 +40,12 @@ const HintTutor: React.FC<HintTutorProps> = ({ hint, theme, onClose, onReveal })
                     <p className="text-sm mt-1">{t(explanationKey)}</p>
                     <p className="text-xs mt-3 font-semibold text-green-700">{t('hintNextStep')}</p>
                 </div>
+            </div>
+            <button 
+                onClick={onClose}
+                className={`absolute top-2 right-2 p-1.5 rounded-full transition-colors ${theme.button}`}
+            >
+                <X className="w-4 h-4" />
             </button>
         </div>
         <style>{`

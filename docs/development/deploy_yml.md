@@ -1,70 +1,23 @@
-# GitHub Actions Workflow for Deploying to GitHub Pages
+# Sudoku Samurai: GitHub Actions Workflow (`deploy.yml`)
 
-This file contains the full YAML content for the deployment workflow. Please follow these steps:
-
-1.  In the root of your GitHub repository, create the following directory and file structure: `.github/workflows/deploy.yml`.
-2.  Copy the entire code block below and paste it into the `deploy.yml` file.
-3.  Commit and push the new file to your repository.
+This document clarifies the status of the `deploy.yml` file for this project.
 
 ---
 
-```yml
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy to GitHub Pages
+### Status: Obsolete for Current Setup
 
-on:
-  # Runs on pushes targeting the main branch
-  push:
-    branches: ["main"]
+In the process of developing this application, we initially explored using a standard build system (Vite, npm, etc.). A GitHub Actions workflow file (`deploy.yml`) is the correct way to automate the building and deployment of such a project.
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+However, to ensure the application runs correctly within the Google AI Studio's unique "no-build-step" environment, we have since removed the build system. The application now runs directly from `index.html` using a CDN for its dependencies and styling.
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+**As a result, a build-based GitHub Actions workflow is no longer necessary or functional for this project.**
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+### Recommended Deployment Method
 
-jobs:
-  # Single deploy job since we're just building
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build
-        run: npm run build
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload the 'dist' directory which contains the built site
-          path: './dist'
-      
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
+The correct and much simpler way to deploy the application is by using GitHub Pages' **"Deploy from a branch"** feature. This method takes your source code as-is and serves it directly, which is perfect for a project without a build step.
+
+**For detailed instructions on how to set this up, please refer to the official deployment guide:**
+
+-   [**`docs/development/deployment.md`**](./deployment.md)
+
+This guide provides a clear, step-by-step process for getting your application live on the web in just a few clicks.

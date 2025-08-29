@@ -21,5 +21,7 @@
   "easy": "Lehká",
   "medium": "Střední",
   "hard": "Těžká",
-  "resetSettings": "Obnovit výchozí"
+  "resetSettings": "Obnovit výchozí",
+  "mistakeChecker": "Kontrola chyb",
+  "hint": "Nápověda"
 }

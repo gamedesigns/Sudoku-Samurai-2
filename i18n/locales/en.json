@@ -21,5 +21,7 @@
   "easy": "Easy",
   "medium": "Medium",
   "hard": "Hard",
-  "resetSettings": "Reset to Default"
+  "resetSettings": "Reset to Default",
+  "mistakeChecker": "Mistake Checker",
+  "hint": "Hint"
 }

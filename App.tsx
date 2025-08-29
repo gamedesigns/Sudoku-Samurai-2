@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw } from 'lucide-react';
+import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb } from 'lucide-react';
 
 import { PUZZLES } from './constants';
 import { lightTheme, darkTheme } from './themes';
 import { Grid, Position, CellValue, Difficulty, Cell } from './types';
-import { generateInitialGrid, checkWin, formatTime } from './utils';
+import { generateInitialGrid, checkWin, formatTime, solveSudoku } from './utils';
 
 import Modal from './components/Modal';
 import SudokuBoard from './components/SudokuBoard';
@@ -26,10 +26,9 @@ const getRandomPuzzle = (difficulty: Difficulty): CellValue[][] => {
 
 const Game: React.FC = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
-  const { darkMode, highlightMode, language } = settings;
+  const { darkMode, highlightMode, language, mistakeChecker } = settings;
   const { t, setLang, lang } = useI18n();
 
-  // Sync i18n language with settings
   useEffect(() => {
     if (lang !== language) {
       setLang(language);
@@ -38,6 +37,7 @@ const Game: React.FC = () => {
   
   const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
   const [grid, setGrid] = useState<Grid>(() => generateInitialGrid(getRandomPuzzle(difficulty)));
+  const [solvedGrid, setSolvedGrid] = useState<Grid | null>(null);
   const [selectedCell, setSelectedCell] = useState<Position>(null);
   
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -50,10 +50,11 @@ const Game: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('inprogress');
   const [time, setTime] = useState(0);
   const [inputMode, setInputMode] = useState<InputMode>('normal');
+  const [incorrectCells, setIncorrectCells] = useState<Set<string>>(new Set());
+  const [hint, setHint] = useState<Position>(null);
 
   const theme = darkMode ? darkTheme : lightTheme;
 
-  // Timer effect
   useEffect(() => {
     let timerId: number;
     if (gameState === 'inprogress') {
@@ -65,9 +66,16 @@ const Game: React.FC = () => {
       window.clearInterval(timerId);
     };
   }, [gameState]);
+  
+  useEffect(() => {
+    startNewGame(difficulty);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startNewGame = useCallback((newDifficulty: Difficulty) => {
-    setGrid(generateInitialGrid(getRandomPuzzle(newDifficulty)));
+    const puzzle = getRandomPuzzle(newDifficulty);
+    const initialGrid = generateInitialGrid(puzzle);
+    setGrid(initialGrid);
+    setSolvedGrid(solveSudoku(initialGrid));
     setDifficulty(newDifficulty);
     setSelectedCell(null);
     setGameState('inprogress');
@@ -75,18 +83,35 @@ const Game: React.FC = () => {
     setInputMode('normal');
     setWinModalOpen(false);
     setNewGameOpen(false);
+    setIncorrectCells(new Set());
+    setHint(null);
   }, []);
 
   const handleCellClick = useCallback((row: number, col: number) => {
     if (grid[row][col].isOriginal) return;
     setSelectedCell(p => p && p[0] === row && p[1] === col ? null : [row, col]);
   }, [grid]);
+  
+  const checkMistakes = useCallback((currentGrid: Grid) => {
+    if (!mistakeChecker || !solvedGrid) return;
+    const newIncorrectCells = new Set<string>();
+    for(let r=0; r<9; r++) {
+        for (let c=0; c<9; c++) {
+            const cell = currentGrid[r][c];
+            if (!cell.isOriginal && cell.value !== 0 && cell.value !== solvedGrid[r][c].value) {
+                newIncorrectCells.add(`${r}-${c}`);
+            }
+        }
+    }
+    setIncorrectCells(newIncorrectCells);
+  }, [mistakeChecker, solvedGrid]);
 
   const handleNumberClick = useCallback((number: CellValue) => {
     if (!selectedCell || gameState !== 'inprogress') return;
+    setHint(null);
     
     const [row, col] = selectedCell;
-    const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)}))); // Deep copy
+    const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)}))); 
     const cell = newGrid[row][col];
 
     if (inputMode === 'notes') {
@@ -103,24 +128,62 @@ const Game: React.FC = () => {
     }
     
     setGrid(newGrid);
+    checkMistakes(newGrid);
 
     if (inputMode === 'normal' && checkWin(newGrid)) {
         setGameState('completed');
         setWinModalOpen(true);
     }
 
-  }, [selectedCell, grid, inputMode, gameState]);
+  }, [selectedCell, grid, inputMode, gameState, checkMistakes]);
   
   const handleDeleteClick = useCallback(() => {
     if (!selectedCell || gameState !== 'inprogress') return;
 
     const [row, col] = selectedCell;
     if (grid[row][col].isOriginal) return;
-
+    
+    setHint(null);
     const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
     newGrid[row][col].value = 0;
     setGrid(newGrid);
-  }, [selectedCell, grid, gameState]);
+    checkMistakes(newGrid);
+  }, [selectedCell, grid, gameState, checkMistakes]);
+  
+  const handleHintClick = useCallback(() => {
+    if (gameState !== 'inprogress' || !solvedGrid) return;
+
+    if (hint) {
+        const [row, col] = hint;
+        const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
+        newGrid[row][col].value = solvedGrid[row][col].value;
+        newGrid[row][col].notes.clear();
+        setGrid(newGrid);
+        checkMistakes(newGrid);
+        setHint(null);
+        setSelectedCell(hint);
+        if (checkWin(newGrid)) {
+            setGameState('completed');
+            setWinModalOpen(true);
+        }
+        return;
+    }
+
+    const emptyCells: [number, number][] = [];
+    for(let r=0; r<9; r++) {
+        for(let c=0; c<9; c++) {
+            if(grid[r][c].value === 0) {
+                emptyCells.push([r,c]);
+            }
+        }
+    }
+
+    if(emptyCells.length > 0) {
+        const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        setHint(randomCell);
+        setSelectedCell(randomCell);
+    }
+  }, [gameState, solvedGrid, grid, hint, checkMistakes]);
 
   const closeAllModals = () => {
       setSettingsOpen(false);
@@ -202,14 +265,21 @@ const Game: React.FC = () => {
             theme={theme}
             highlightMode={highlightMode}
             onCellClick={handleCellClick}
+            incorrectCells={incorrectCells}
+            hint={hint}
           />
           <div className="flex flex-col items-center space-y-4">
             <ModeToggle />
-            <NumberPad
-              theme={theme}
-              onNumberClick={handleNumberClick}
-              onDeleteClick={handleDeleteClick}
-            />
+            <div className="flex items-center w-full max-w-md mx-auto space-x-2 sm:space-x-3">
+              <NumberPad
+                theme={theme}
+                onNumberClick={handleNumberClick}
+                onDeleteClick={handleDeleteClick}
+              />
+              <button onClick={handleHintClick} className={`h-full aspect-square rounded-lg sm:rounded-xl font-bold transition-all duration-200 flex items-center justify-center ${theme.button} ${theme.text} hover:scale-105 active:scale-95`}>
+                <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7" />
+              </button>
+            </div>
           </div>
         </main>
         
@@ -222,6 +292,15 @@ const Game: React.FC = () => {
                 className={`w-12 h-6 rounded-full transition-colors ${highlightMode ? theme.toggleBgActive : theme.toggleBg} relative`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${highlightMode ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-medium">{t('mistakeChecker')}</span>
+              <button
+                onClick={() => setSettings(s => ({ ...s, mistakeChecker: !s.mistakeChecker }))}
+                className={`w-12 h-6 rounded-full transition-colors ${mistakeChecker ? theme.toggleBgActive : theme.toggleBg} relative`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${mistakeChecker ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div>

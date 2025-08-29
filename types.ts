@@ -30,4 +30,7 @@ export interface Theme {
   toggleBg: string;
   toggleBgActive: string;
   noteText: string;
+  cellErrorBg: string;
+  cellErrorText: string;
+  cellHintBorder: string;
 }

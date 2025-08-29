@@ -17,7 +17,10 @@ export const lightTheme: Theme = {
   userText: 'text-blue-600',
   toggleBg: 'bg-gray-300',
   toggleBgActive: 'bg-red-500',
-  noteText: 'text-amber-800'
+  noteText: 'text-amber-800',
+  cellErrorBg: 'bg-red-200',
+  cellErrorText: 'text-red-700 font-bold',
+  cellHintBorder: 'border-green-500',
 };
 
 export const darkTheme: Theme = {
@@ -37,5 +40,8 @@ export const darkTheme: Theme = {
   userText: 'text-cyan-400',
   toggleBg: 'bg-gray-500',
   toggleBgActive: 'bg-blue-500',
-  noteText: 'text-cyan-500'
+  noteText: 'text-cyan-500',
+  cellErrorBg: 'bg-red-900/50',
+  cellErrorText: 'text-red-400 font-bold',
+  cellHintBorder: 'border-green-400',
 };

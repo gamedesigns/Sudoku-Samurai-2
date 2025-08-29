@@ -7,6 +7,8 @@ interface SudokuBoardProps {
   theme: Theme;
   highlightMode: boolean;
   onCellClick: (row: number, col: number) => void;
+  incorrectCells: Set<string>;
+  hint: Position;
 }
 
 const SudokuBoard: React.FC<SudokuBoardProps> = ({
@@ -15,10 +17,14 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
   theme,
   highlightMode,
   onCellClick,
+  incorrectCells,
+  hint,
 }) => {
   const getCellClass = (row: number, col: number, cell: Cell): string => {
     const { value, isOriginal } = cell;
     const isSelected = selectedCell?.[0] === row && selectedCell?.[1] === col;
+    const isIncorrect = incorrectCells.has(`${row}-${col}`);
+    const isHinted = hint?.[0] === row && hint?.[1] === col;
     
     let isHighlighted = false;
     let isSameNumber = false;
@@ -51,7 +57,9 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
     `;
 
     let stateClasses = '';
-    if (isSelected) {
+    if (isIncorrect) {
+      stateClasses = theme.cellErrorBg;
+    } else if (isSelected) {
       stateClasses = `${theme.cellSelected} text-white shadow-lg scale-105 z-10`;
     } else if (isSameNumber) {
       stateClasses = `${theme.cellSelected} bg-opacity-70`;
@@ -61,9 +69,19 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
       stateClasses = `${theme.cellBg}`;
     }
 
-    const textClasses = isOriginal ? theme.originalText : theme.userText;
+    let textClasses = '';
+    if (isIncorrect) {
+        textClasses = theme.cellErrorText;
+    } else {
+        textClasses = isOriginal ? theme.originalText : theme.userText;
+    }
+    
+    let hintClasses = '';
+    if (isHinted) {
+        hintClasses = `ring-4 ${theme.cellHintBorder} z-20`;
+    }
 
-    return `${baseClasses} ${borderClasses} ${stateClasses} ${textClasses}`;
+    return `${baseClasses} ${borderClasses} ${stateClasses} ${textClasses} ${hintClasses}`;
   };
 
   return (

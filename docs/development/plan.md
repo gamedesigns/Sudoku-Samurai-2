@@ -42,7 +42,7 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
 
 ---
 
-### Phase 3: The Guiding Sensei - Settings & Hints (Target: v0.3.0)
+### 🚧 Phase 3: The Guiding Sensei - Settings & Hints (In Progress)
 
 **Goal**: Implement an innovative hint system and add robust settings management.
 
@@ -51,13 +51,13 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
     -   [x] Implemented language selection (English, Czech, German).
     -   [x] User settings (theme, language, etc.) are now persisted in the browser.
     -   [x] Added a "Reset to Default" option.
--   **Hint System (Upcoming)**:
-    -   Develop the "Path of Logic" multi-level hints:
-        -   **Level 1: Gentle Nudge**: Highlights a cell or region where the next logical move can be made.
-        -   **Level 2: Technique Tutor**: Explains the Sudoku technique required (e.g., "Look for a Hidden Single in this box.").
-        -   **Level 3: Master's Insight**: Visually demonstrates the logic of the technique.
--   **Feedback Tools (Upcoming)**:
-    -   Implement the optional "Mistake Checker" to highlight incorrect entries in real-time.
+-   **Hint System & Feedback Tools**:
+    -   [x] Implemented optional "Mistake Checker" to highlight incorrect entries in real-time.
+    -   [x] Implemented "Path of Logic" hints (Level 1 & 3):
+        -   [x] **Gentle Nudge**: Highlights a solvable cell.
+        -   [x] **Master's Insight**: Fills the cell with the correct number.
+-   **Upcoming in this Phase**:
+    -   **Level 2: Technique Tutor**: Explain *why* the hint is correct (e.g., "Hidden Single").
 
 ---
 

@@ -21,5 +21,7 @@
   "easy": "Einfach",
   "medium": "Mittel",
   "hard": "Schwer",
-  "resetSettings": "Zurücksetzen"
+  "resetSettings": "Zurücksetzen",
+  "mistakeChecker": "Fehlerprüfung",
+  "hint": "Hinweis"
 }

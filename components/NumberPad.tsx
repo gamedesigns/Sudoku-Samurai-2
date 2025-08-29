@@ -9,7 +9,7 @@ interface NumberPadProps {
 
 const NumberPad: React.FC<NumberPadProps> = ({ theme, onNumberClick, onDeleteClick }) => {
   return (
-    <div className={`w-full max-w-md mx-auto ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 border-2 ${theme.border}`}>
+    <div className={`w-full ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 border-2 ${theme.border}`}>
       <div className="grid grid-cols-5 gap-2 sm:gap-3">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
           <button

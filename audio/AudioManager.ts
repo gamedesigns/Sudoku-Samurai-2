@@ -1,5 +1,5 @@
-import { SoundEvent, MusicProfile, Difficulty } from '../types';
-import { AUDIO_CONFIG } from '../config';
+import { SoundEvent, MusicProfile, Difficulty } from '../types.ts';
+import { AUDIO_CONFIG } from '../config.ts';
 
 class AudioManager {
     private audioContext: AudioContext | null = null;

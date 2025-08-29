@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { Theme } from '../types';
+import { Theme } from '../types.ts';
 
 interface ModalProps {
   show: boolean;

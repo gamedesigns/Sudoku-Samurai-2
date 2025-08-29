@@ -1,4 +1,4 @@
-import { CellValue, Difficulty } from '../types';
+import { CellValue, Difficulty } from '../types.ts';
 
 export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> = {
     Novice: [
@@ -17,19 +17,10 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
             [1,6,3,4,2,5],
             [3,5,6,2,1,4],
             [4,2,1,3,5,6]
-        ],
-        [
-            [3,6,2,4,1,5],
-            [1,4,5,3,6,2],
-            [5,1,3,6,2,4],
-            [2,3,6,5,4,1],
-            [4,2,1,2,5,6],
-            [6,5,4,1,3,2]
         ]
     ],
 
     Easy: [
-        // Fixed first easy puzzle (was using 7 instead of valid numbers)
         [
             [6,5,3,4,1,2],
             [2,1,4,3,6,5],
@@ -38,7 +29,6 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
             [4,6,1,2,5,3],
             [5,3,2,1,4,6]
         ],
-        // Second easy puzzle (this one was already valid)
         [
             [1,2,3,4,5,6],
             [4,5,6,1,2,3],
@@ -47,18 +37,16 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
             [2,3,1,5,6,4],
             [5,6,4,2,3,1]
         ],
-        // New diverse easy puzzle
         [
             [2,1,5,6,3,4],
             [6,3,4,2,1,5],
             [1,5,3,4,6,2],
-            [4,6,2,5,3,1],
+            [4,6,2,5,1,3],
             [3,2,6,1,4,5],
             [5,4,1,3,2,6]
         ]
     ],
     Medium: [
-        // Fixed first medium puzzle (had duplicate 4 in last row)
         [
             [6,3,4,1,2,5],
             [2,1,5,6,3,4],
@@ -67,40 +55,13 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
             [3,4,6,5,1,2],
             [5,2,1,4,6,3]
         ],
-        // Fixed second medium puzzle (had duplicate 3 in row 5)
         [
             [2,6,1,4,5,3],
             [4,3,5,2,6,1],
             [6,1,4,5,3,2],
             [5,2,3,1,4,6],
-            [3,5,6,3,1,4],
-            [1,4,2,6,3,5]
-        ],
-        // New diverse medium puzzle
-        [
-            [3,4,6,2,1,5],
-            [1,5,2,3,4,6],
-            [5,2,1,6,3,4],
-            [6,3,4,1,5,2],
-            [4,1,3,5,6,2],
-            [2,6,5,4,2,1]
-        ],
-        // Another new puzzle with different pattern
-        [
-            [4,1,3,5,6,2],
-            [5,6,2,4,1,3],
-            [2,3,5,1,4,6],
-            [6,4,1,3,2,5],
-            [1,5,4,6,3,2],
-            [3,2,6,2,5,4]
-        ],
-        [
-            [2,5,6,1,4,3],
-            [4,1,3,2,6,5],
-            [6,3,1,5,2,4],
-            [1,2,4,6,3,5],
-            [5,6,2,4,1,3],
-            [3,4,5,3,6,1]
+            [3,5,2,6,1,4],
+            [1,4,6,3,2,5]
         ],
         [
             [4,6,1,3,5,2],
@@ -112,7 +73,6 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
         ]
     ],
     Hard: [
-        // New hard puzzles with more complex patterns
         [
             [6,2,4,3,5,1],
             [3,1,5,6,4,2],
@@ -126,16 +86,16 @@ export const CLASSIC_6X6_PUZZLES: Partial<Record<Difficulty, CellValue[][][]>> =
             [2,4,6,5,3,1],
             [1,6,3,2,5,4],
             [4,2,5,1,6,3],
-            [6,1,4,3,1,5],
-            [3,5,2,6,4,1]
+            [6,1,4,3,5,2],
+            [3,5,2,6,1,4]
         ],
         [
             [1,4,2,6,3,5],
             [6,5,3,1,2,4],
             [3,2,5,4,6,1],
-            [5,1,6,3,4,2],
+            [4,1,6,3,5,2],
             [2,6,4,5,1,3],
-            [4,3,1,2,5,6]
+            [5,3,1,2,4,6]
         ]
     ]
 };

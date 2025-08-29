@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { CellValue, DisplayMode, GameConfig, Theme } from '../types';
-import { COLOR_MAP, JAPANESE_NUMBER_MAP, LETTER_MAP, KIDS_ICON_MAP } from '../constants';
+import { CellValue, DisplayMode, GameConfig, Theme } from '../types.ts';
+import { COLOR_MAP, JAPANESE_NUMBER_MAP, LETTER_MAP, KIDS_ICON_MAP } from '../constants.tsx';
 
 interface DragGhostProps {
   number: CellValue;

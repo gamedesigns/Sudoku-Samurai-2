@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { Grid, Position, Theme, Cell, GameConfig, Hint, DisplayMode, DuelState, PlayerColor } from '../types';
-import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants';
+import { Grid, Position, Theme, Cell, GameConfig, Hint, DisplayMode, DuelState, PlayerColor } from '../types.ts';
+import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants.tsx';
 
 interface SudokuBoardProps {
   grid: Grid;

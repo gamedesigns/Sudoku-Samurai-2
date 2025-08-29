@@ -1,6 +1,6 @@
 # Sudoku Samurai 侍
 
-**Version 1.5.0**
+**Version 1.6.1**
 
 ![Sudoku Samurai Banner](https://img.shields.io/badge/Sudoku-Samurai-red?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMgM2g3djdoLTd6Ii8+PHBhdGggZD0iTTE0IDNoN3Y3aC03eiIvPjxwYXRoIGQ0iTTE0IDE0aDdoN3Y3aC03eiIvPjxwYXRoIGQ0iTTMgMTRoN3Y3aC03eiIvPjwvc3ZnPg==)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Hint, Theme } from '../types';
-import { useI18n } from '../i18n/I18nProvider';
+import { Hint, Theme } from '../types.ts';
+import { useI18n } from '../i18n/I18nProvider.tsx';
 import { Lightbulb, X } from 'lucide-react';
 
 interface HintTutorProps {

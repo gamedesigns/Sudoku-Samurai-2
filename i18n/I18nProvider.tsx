@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback, useMemo, useEffect } from 'react';
-import { Language } from '../types';
+import { Language } from '../types.ts';
 
 type Translations = Record<Language, Record<string, string>>;
 

@@ -1,4 +1,4 @@
-import { Cell, CellValue, Difficulty, GameConfig, Grid, GridSize } from './types';
+import { Cell, CellValue, Difficulty, GameConfig, Grid, GridSize } from './types.ts';
 
 export const generateInitialGrid = (puzzle: CellValue[][], config: GameConfig): Grid => {
   if (!puzzle || !Array.isArray(puzzle)) {

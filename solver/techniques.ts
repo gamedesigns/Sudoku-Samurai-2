@@ -1,4 +1,4 @@
-import { Grid, GameConfig, CellValue, Position, HintTechnique } from '../types';
+import { Grid, GameConfig, CellValue, Position, HintTechnique } from '../types.ts';
 
 type FoundHint = { position: Position, technique: HintTechnique };
 

@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { CellValue, GameConfig, Theme, DisplayMode } from '../types';
-import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants';
+import { CellValue, GameConfig, Theme, DisplayMode } from '../types.ts';
+import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants.tsx';
 
 interface NumberPadProps {
   theme: Theme;

@@ -1,7 +1,8 @@
 
+
 import React from 'react';
 import { Menu, X, Volume2, VolumeX } from 'lucide-react';
-import { Theme } from '../types';
+import { Theme } from '../types.ts';
 
 interface HeaderProps {
     theme: Theme;

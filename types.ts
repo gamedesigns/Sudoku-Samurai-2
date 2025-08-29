@@ -108,4 +108,5 @@ export interface Theme {
   tutorBg: string;
   phistoRingCornerBg: string;
   phistoRingCenterBg: string;
+  progressBg: string;
 }

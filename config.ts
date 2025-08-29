@@ -1,4 +1,4 @@
-import { GameConfig, Language, AppSettings as AppSettingsType, ThemeName, SoundEvent, MusicProfile, Difficulty, DisplayMode, Player } from './types';
+import { GameConfig, Language, AppSettings as AppSettingsType, ThemeName, SoundEvent, MusicProfile, Difficulty, DisplayMode, Player } from './types.ts';
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
     size: 9,

@@ -1,4 +1,4 @@
-import { Theme } from './types';
+import { Theme } from './types.ts';
 
 export const lightTheme: Theme = {
   bg: 'bg-slate-100',
@@ -26,6 +26,7 @@ export const lightTheme: Theme = {
   tutorBg: 'bg-green-100 border-green-300',
   phistoRingCornerBg: 'bg-purple-100',
   phistoRingCenterBg: 'bg-orange-100',
+  progressBg: '#e2e8f0', // slate-200
 };
 
 export const warmTheme: Theme = {
@@ -54,6 +55,7 @@ export const warmTheme: Theme = {
   tutorBg: 'bg-green-100 border-green-300',
   phistoRingCornerBg: 'bg-purple-100',
   phistoRingCenterBg: 'bg-orange-100',
+  progressBg: '#fde68a', // amber-200
 };
 
 export const darkTheme: Theme = {
@@ -82,4 +84,5 @@ export const darkTheme: Theme = {
   tutorBg: 'bg-green-900/50 border-green-700',
   phistoRingCornerBg: 'bg-purple-900/40',
   phistoRingCenterBg: 'bg-orange-900/40',
+  progressBg: '#374151', // gray-700
 };

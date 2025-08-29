@@ -1,7 +1,7 @@
 # Sudoku Samurai: Development Plan
 
 -   **Author**: Daniel Sandner
--   **Current Version**: v0.2.0
+-   **Current Version**: v0.3.0
 
 This document outlines the development roadmap for Sudoku Samurai, translating the ideas from the initial design document into a structured, phased implementation plan.
 
@@ -16,7 +16,7 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
     -   [x] Fully responsive design for mobile and desktop, ensuring the board and number pads are always correctly sized and square.
     -   [x] Clean, modular code structure using React components (`SudokuBoard`, `NumberPad`, `Header`, `Modal`).
 -   [x] **Core Gameplay**:
-    -   [x] User input handling supporting both "Cell First" and "Digit First" methods.
+    -   [x] User input handling.
     -   [x] Highlighting for rows, columns, boxes, and identical numbers.
 -   [x] **Customization**:
     -   [x] Switchable Light and Dark themes.
@@ -34,7 +34,7 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
     -   [x] Display a win screen/modal upon successful puzzle completion.
 -   [x] **User Features**:
     -   [x] Introduce a game timer.
-    -   [x] Implement a "Pencil Marks" (notes) feature for users to jot down potential numbers in a cell.
+    -   [x] Implement a "Pencil Marks" (notes) feature.
     -   [x] Add a difficulty selector (Easy, Medium, Hard) that loads different puzzles.
 -   [x] **UI/UX Refinements**:
     -   [x] Add subtle animations for number placement and board interactions.
@@ -42,16 +42,21 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
 
 ---
 
-### Phase 3: The Guiding Sensei - Innovative Hint System (Target: v0.3.0)
+### Phase 3: The Guiding Sensei - Settings & Hints (Target: v0.3.0)
 
-**Goal**: Implement the "Guiding Sensei" hint system to teach players rather than just reveal answers.
+**Goal**: Implement an innovative hint system and add robust settings management.
 
--   **Hint System**:
+-   **Settings & Internationalization (i18n)**:
+    -   [x] Added "Novice" difficulty level.
+    -   [x] Implemented language selection (English, Czech, German).
+    -   [x] User settings (theme, language, etc.) are now persisted in the browser.
+    -   [x] Added a "Reset to Default" option.
+-   **Hint System (Upcoming)**:
     -   Develop the "Path of Logic" multi-level hints:
         -   **Level 1: Gentle Nudge**: Highlights a cell or region where the next logical move can be made.
         -   **Level 2: Technique Tutor**: Explains the Sudoku technique required (e.g., "Look for a Hidden Single in this box.").
         -   **Level 3: Master's Insight**: Visually demonstrates the logic of the technique.
--   **Feedback Tools**:
+-   **Feedback Tools (Upcoming)**:
     -   Implement the optional "Mistake Checker" to highlight incorrect entries in real-time.
 
 ---

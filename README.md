@@ -1,6 +1,6 @@
 # Sudoku Samurai 侍
 
-**Version 0.2.0**
+**Version 0.3.0**
 
 ![Sudoku Samurai Banner](https://img.shields.io/badge/Sudoku-Samurai-red?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMgM2g3djdoLTd6Ii8+PHBhdGggZD0iTTE0IDNoN3Y3aC03eiIvPjxwYXRoIGQ9Ik0xNCAxNGg3djdoLTd6Ii8+PHBhdGggZD0iTTMgMTRoN3Y3aC03eiIvPjwvc3ZnPg==)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -10,8 +10,10 @@ Welcome to Sudoku Samurai, a modern take on the classic logic puzzle. This appli
 ## ✨ Features
 
 -   **Responsive Design**: Flawless gameplay on both mobile and desktop screens.
+-   **Multiple Languages**: Play in English, Czech, or German.
+-   **Persistent Settings**: Your preferences for theme, language, and highlighting are saved in your browser.
 -   **Pencil Marks (Notes)**: Toggle to "Notes" mode to jot down potential numbers in a cell.
--   **Difficulty Levels**: Choose from Easy, Medium, and Hard puzzles.
+-   **Four Difficulty Levels**: Choose from Novice, Easy, Medium, and Hard puzzles.
 -   **Game Timer**: Track your solving speed for every puzzle.
 -   **Win Detection**: The game automatically detects when you've successfully solved the puzzle.
 -   **Intelligent Highlighting**: Automatically highlights the selected row, column, box, and all instances of a selected number.

@@ -9,7 +9,8 @@ export type Cell = {
 
 export type Grid = Cell[][];
 
-export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+export type Difficulty = 'Novice' | 'Easy' | 'Medium' | 'Hard';
+export type Language = 'en' | 'cs' | 'de';
 
 export interface Theme {
   bg: string;

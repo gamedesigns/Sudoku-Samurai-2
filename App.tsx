@@ -1,19 +1,43 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, BrainCircuit, Play } from 'lucide-react';
-import { PUZZLES, MEDIUM_PUZZLE } from './constants';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw } from 'lucide-react';
+
+import { PUZZLES } from './constants';
 import { lightTheme, darkTheme } from './themes';
 import { Grid, Position, CellValue, Difficulty, Cell } from './types';
 import { generateInitialGrid, checkWin, formatTime } from './utils';
+
 import Modal from './components/Modal';
 import SudokuBoard from './components/SudokuBoard';
 import NumberPad from './components/NumberPad';
 import Header from './components/Header';
 
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { I18nProvider, useI18n } from './i18n/I18nProvider';
+import { DEFAULT_SETTINGS, LANGUAGES, AppSettings } from './config';
+
+
 type GameState = 'new' | 'inprogress' | 'completed';
 type InputMode = 'normal' | 'notes';
 
-const App: React.FC = () => {
-  const [grid, setGrid] = useState<Grid>(() => generateInitialGrid(MEDIUM_PUZZLE));
+const getRandomPuzzle = (difficulty: Difficulty): CellValue[][] => {
+  const puzzleSet = PUZZLES[difficulty];
+  return puzzleSet[Math.floor(Math.random() * puzzleSet.length)];
+};
+
+const Game: React.FC = () => {
+  const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
+  const { darkMode, highlightMode, language } = settings;
+  const { t, setLang, lang } = useI18n();
+
+  // Sync i18n language with settings
+  useEffect(() => {
+    if (lang !== language) {
+      setLang(language);
+    }
+  }, [language, lang, setLang]);
+  
+  const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
+  const [grid, setGrid] = useState<Grid>(() => generateInitialGrid(getRandomPuzzle(difficulty)));
   const [selectedCell, setSelectedCell] = useState<Position>(null);
   
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -22,9 +46,6 @@ const App: React.FC = () => {
   const [isThemesOpen, setThemesOpen] = useState(false);
   const [isNewGameOpen, setNewGameOpen] = useState(false);
   const [isWinModalOpen, setWinModalOpen] = useState(false);
-
-  const [darkMode, setDarkMode] = useState(false);
-  const [highlightMode, setHighlightMode] = useState(true);
 
   const [gameState, setGameState] = useState<GameState>('inprogress');
   const [time, setTime] = useState(0);
@@ -45,8 +66,9 @@ const App: React.FC = () => {
     };
   }, [gameState]);
 
-  const startNewGame = useCallback((difficulty: Difficulty) => {
-    setGrid(generateInitialGrid(PUZZLES[difficulty]));
+  const startNewGame = useCallback((newDifficulty: Difficulty) => {
+    setGrid(generateInitialGrid(getRandomPuzzle(newDifficulty)));
+    setDifficulty(newDifficulty);
     setSelectedCell(null);
     setGameState('inprogress');
     setTime(0);
@@ -68,21 +90,20 @@ const App: React.FC = () => {
     const cell = newGrid[row][col];
 
     if (inputMode === 'notes') {
-        if(cell.value === 0) { // Can only add notes to empty cells
+        if(cell.value === 0) {
             if (cell.notes.has(number)) {
                 cell.notes.delete(number);
             } else {
                 cell.notes.add(number);
             }
         }
-    } else { // Normal mode
+    } else {
         cell.value = cell.value === number ? 0 : number;
         cell.notes.clear();
     }
     
     setGrid(newGrid);
 
-    // Check for win condition after a number is placed
     if (inputMode === 'normal' && checkWin(newGrid)) {
         setGameState('completed');
         setWinModalOpen(true);
@@ -97,7 +118,7 @@ const App: React.FC = () => {
     if (grid[row][col].isOriginal) return;
 
     const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
-    newGrid[row][col].value = 0; // Always clear the main value
+    newGrid[row][col].value = 0;
     setGrid(newGrid);
   }, [selectedCell, grid, gameState]);
 
@@ -108,14 +129,19 @@ const App: React.FC = () => {
       setMenuOpen(false);
       setNewGameOpen(false);
   };
+
+  const handleResetSettings = () => {
+    setSettings(DEFAULT_SETTINGS);
+    closeAllModals();
+  };
   
   const ModeToggle: React.FC = () => (
       <div className={`flex items-center justify-center p-1 rounded-full ${theme.cardBg} border-2 ${theme.border} shadow-inner`}>
           <button onClick={() => setInputMode('normal')} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'normal' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
-              Number
+              {t('number')}
           </button>
           <button onClick={() => setInputMode('notes')} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'notes' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
-              Notes
+              {t('notes')}
           </button>
       </div>
   );
@@ -132,35 +158,42 @@ const App: React.FC = () => {
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Play className="w-5 h-5" />
-              <span>New Game</span>
+              <span>{t('newGame')}</span>
             </button>
             <button
               onClick={() => { setSettingsOpen(true); setMenuOpen(false); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Settings className="w-5 h-5" />
-              <span>Settings</span>
+              <span>{t('settings')}</span>
             </button>
             <button
               onClick={() => { setThemesOpen(true); setMenuOpen(false); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Palette className="w-5 h-5" />
-              <span>Themes</span>
+              <span>{t('themes')}</span>
+            </button>
+            <button
+              onClick={handleResetSettings}
+              className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
+            >
+              <RefreshCw className="w-5 h-5" />
+              <span>{t('resetSettings')}</span>
             </button>
             <button
               onClick={() => { setAboutOpen(true); setMenuOpen(false); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Info className="w-5 h-5" />
-              <span>About</span>
+              <span>{t('about')}</span>
             </button>
           </div>
         )}
 
         <main className="flex-grow flex flex-col justify-center p-4 space-y-4">
           <div className="flex justify-between items-center px-2">
-            <div className="text-sm font-medium">Difficulty: Medium</div>
+            <div className="text-sm font-medium">{t('difficulty')}: {t(difficulty.toLowerCase())}</div>
             <div className="text-lg font-semibold tabular-nums">{formatTime(time)}</div>
           </div>
           <SudokuBoard 
@@ -180,69 +213,77 @@ const App: React.FC = () => {
           </div>
         </main>
         
-        {/* --- MODALS --- */}
-
-        <Modal show={isSettingsOpen} onClose={() => setSettingsOpen(false)} title="Settings" theme={theme}>
-          <div className="space-y-4">
+        <Modal show={isSettingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings')} theme={theme}>
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <span className="font-medium">Highlight Mode</span>
+              <span className="font-medium">{t('highlightMode')}</span>
               <button
-                onClick={() => setHighlightMode(!highlightMode)}
+                onClick={() => setSettings(s => ({ ...s, highlightMode: !s.highlightMode }))}
                 className={`w-12 h-6 rounded-full transition-colors ${highlightMode ? theme.toggleBgActive : theme.toggleBg} relative`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${highlightMode ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
+            <div>
+              <span className="font-medium block mb-2">{t('language')}</span>
+              <div className="flex space-x-2">
+                {LANGUAGES.map(({ code, name }) => (
+                    <button key={code} onClick={() => setSettings(s => ({...s, language: code}))} className={`w-full p-2 text-sm rounded-lg font-semibold border-2 transition-colors ${language === code ? 'border-red-500 bg-red-50' : `border-transparent ${theme.button}`}`}>
+                        {name}
+                    </button>
+                ))}
+              </div>
+            </div>
           </div>
         </Modal>
 
-        <Modal show={isThemesOpen} onClose={() => setThemesOpen(false)} title="Themes" theme={theme}>
+        <Modal show={isThemesOpen} onClose={() => setThemesOpen(false)} title={t('themes')} theme={theme}>
           <div className="space-y-3">
             <button
-              onClick={() => { setDarkMode(false); closeAllModals(); }}
+              onClick={() => { setSettings(s => ({...s, darkMode: false})); closeAllModals(); }}
               className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${!darkMode ? 'border-red-500 bg-red-50' : `border-transparent ${theme.button}`}`}
             >
               <Sun className={`w-5 h-5 ${!darkMode ? 'text-red-500' : theme.text}`} />
-              <span className={`${!darkMode ? 'text-red-700' : theme.text}`}>Light Theme</span>
+              <span className={`${!darkMode ? 'text-red-700' : theme.text}`}>{t('lightTheme')}</span>
             </button>
             <button
-              onClick={() => { setDarkMode(true); closeAllModals(); }}
+              onClick={() => { setSettings(s => ({...s, darkMode: true})); closeAllModals(); }}
               className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${darkMode ? 'border-blue-500 bg-blue-900/20' : `border-transparent ${theme.button}`}`}
             >
               <Moon className={`w-5 h-5 ${darkMode ? 'text-blue-500' : theme.text}`} />
-              <span className={`${darkMode ? 'text-blue-300' : theme.text}`}>Dark Theme</span>
+              <span className={`${darkMode ? 'text-blue-300' : theme.text}`}>{t('darkTheme')}</span>
             </button>
           </div>
         </Modal>
 
-        <Modal show={isAboutOpen} onClose={() => setAboutOpen(false)} title="About Sudoku Samurai" theme={theme}>
+        <Modal show={isAboutOpen} onClose={() => setAboutOpen(false)} title={t('aboutTitle')} theme={theme}>
           <div className="space-y-4 text-sm">
-            <p>Embrace the way of the samurai with intuitive controls, elegant design, and a sharp focus on the classic logic puzzle.</p>
-            <p className="text-xs opacity-70">Version 0.2.0 • Created by Daniel Sandner</p>
+            <p>{t('aboutText1')}</p>
+            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.3.0'})}</p>
           </div>
         </Modal>
 
-        <Modal show={isNewGameOpen} onClose={() => setNewGameOpen(false)} title="New Game" theme={theme}>
+        <Modal show={isNewGameOpen} onClose={() => setNewGameOpen(false)} title={t('newGame')} theme={theme}>
             <div className="space-y-3 text-center">
-                <p className="mb-4">Select a difficulty to start a new puzzle.</p>
-                {(['Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
+                <p className="mb-4">{t('newGameText')}</p>
+                {(['Novice', 'Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
                     <button key={diff} onClick={() => startNewGame(diff)} className={`w-full p-4 rounded-xl font-bold transition-colors ${theme.button}`}>
-                        {diff}
+                        {t(diff.toLowerCase())}
                     </button>
                 ))}
             </div>
         </Modal>
 
-        <Modal show={isWinModalOpen} onClose={() => setWinModalOpen(false)} title="Congratulations!" theme={theme}>
+        <Modal show={isWinModalOpen} onClose={() => setWinModalOpen(false)} title={t('winTitle')} theme={theme}>
             <div className="space-y-4 text-center">
                 <Award className="w-16 h-16 mx-auto text-amber-500" strokeWidth={1.5} />
-                <p className="text-lg">You solved the puzzle!</p>
+                <p className="text-lg">{t('winText')}</p>
                 <p className="text-2xl font-bold">{formatTime(time)}</p>
-                <p className="pt-4">Play another round?</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    {(['Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
+                <p className="pt-4">{t('winPlayAgain')}</p>
+                <div className="grid grid-cols-2 gap-2">
+                    {(['Novice', 'Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
                         <button key={diff} onClick={() => startNewGame(diff)} className={`w-full p-3 rounded-xl font-bold transition-colors ${theme.button}`}>
-                            {diff}
+                            {t(diff.toLowerCase())}
                         </button>
                     ))}
                 </div>
@@ -253,5 +294,11 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <I18nProvider>
+    <Game />
+  </I18nProvider>
+);
 
 export default App;

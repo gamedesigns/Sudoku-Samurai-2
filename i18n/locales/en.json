@@ -42,5 +42,10 @@
   "noPuzzleError": "Sorry, no puzzles are available for this mode and difficulty yet.",
   "startFullscreen": "Start in Fullscreen",
   "musicVolume": "Music Volume",
-  "sfxVolume": "Sound Effects Volume"
+  "sfxVolume": "Sound Effects Volume",
+  "musicProfile": "Music Profile",
+  "musicProfile_calm": "Calm",
+  "musicProfile_powerful": "Powerful",
+  "musicProfile_level": "Level",
+  "musicProfile_mixed": "Mixed"
 }

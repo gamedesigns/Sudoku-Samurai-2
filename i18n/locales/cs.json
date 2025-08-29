@@ -42,5 +42,10 @@
   "noPuzzleError": "Pro tento režim a obtížnost bohužel zatím nejsou k dispozici žádné hádanky.",
   "startFullscreen": "Spustit na celou obrazovku",
   "musicVolume": "Hlasitost hudby",
-  "sfxVolume": "Hlasitost efektů"
+  "sfxVolume": "Hlasitost efektů",
+  "musicProfile": "Hudební profil",
+  "musicProfile_calm": "Klidný",
+  "musicProfile_powerful": "Výpravný",
+  "musicProfile_level": "Úroveň",
+  "musicProfile_mixed": "Smíšený"
 }

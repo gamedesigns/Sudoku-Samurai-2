@@ -42,5 +42,10 @@
   "noPuzzleError": "Für diesen Modus und Schwierigkeitsgrad sind leider noch keine Rätsel verfügbar.",
   "startFullscreen": "Im Vollbildmodus starten",
   "musicVolume": "Musik-Lautstärke",
-  "sfxVolume": "Effekt-Lautstärke"
+  "sfxVolume": "Effekt-Lautstärke",
+  "musicProfile": "Musikprofil",
+  "musicProfile_calm": "Ruhig",
+  "musicProfile_powerful": "Kraftvoll",
+  "musicProfile_level": "Stufe",
+  "musicProfile_mixed": "Gemischt"
 }

@@ -3,7 +3,7 @@ import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Li
 
 import { getRandomPuzzle, hasPuzzles } from './constants';
 import { lightTheme, darkTheme, warmTheme } from './themes';
-import { Grid, Position, CellValue, Cell, GameConfig, Hint, AppSettings, SoundEvent } from './types';
+import { Grid, Position, CellValue, Cell, GameConfig, Hint, AppSettings, SoundEvent, MusicProfile } from './types';
 import { generateInitialGrid, checkWin, formatTime, solveSudoku } from './utils';
 import { findHint } from './solver/techniques';
 
@@ -15,7 +15,7 @@ import HintTutor from './components/HintTutor';
 
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
-import { DEFAULT_SETTINGS, LANGUAGES, GAME_MODES, DEFAULT_GAME_CONFIG } from './config';
+import { DEFAULT_SETTINGS, LANGUAGES, GAME_MODES, DEFAULT_GAME_CONFIG, MUSIC_PROFILES } from './config';
 import { audioManager } from './audio/AudioManager';
 
 
@@ -24,7 +24,7 @@ type InputMode = 'normal' | 'notes';
 
 const Game: React.FC = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
-  const { theme: themeName, highlightMode, language, mistakeChecker, gameConfig, startFullscreen, musicVolume, sfxVolume, isMuted } = settings;
+  const { theme: themeName, highlightMode, language, mistakeChecker, gameConfig, startFullscreen, musicVolume, sfxVolume, isMuted, musicProfile } = settings;
   const { t, setLang, lang } = useI18n();
   const isInitialized = useRef(false);
 
@@ -113,8 +113,8 @@ const Game: React.FC = () => {
     setNewGameOpen(false);
     setIncorrectCells(new Set());
     setHint(null);
-    audioManager.playMusic('background');
-  }, [setSettings, t, startFullscreen, initializeAudio]);
+    audioManager.playBackgroundMusic(settings.musicProfile, newConfig.difficulty);
+  }, [setSettings, t, startFullscreen, initializeAudio, settings.musicProfile]);
 
   const handleCellClick = useCallback((row: number, col: number) => {
     audioManager.playSound('click');
@@ -381,6 +381,23 @@ const Game: React.FC = () => {
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${startFullscreen ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
+             <div>
+              <span className="font-medium block mb-2">{t('musicProfile')}</span>
+              <select
+                  value={musicProfile}
+                  onChange={(e) => {
+                      const newProfile = e.target.value as MusicProfile;
+                      setSettings(s => ({ ...s, musicProfile: newProfile }));
+                      audioManager.playBackgroundMusic(newProfile, gameConfig.difficulty);
+                      audioManager.playSound('click');
+                  }}
+                  className={`w-full p-3 rounded-lg border-2 ${theme.border} ${theme.cardBg} focus:outline-none focus:ring-2 focus:ring-blue-400`}
+              >
+                  {MUSIC_PROFILES.map(profile => (
+                      <option key={profile} value={profile}>{t(`musicProfile_${profile.toLowerCase()}`)}</option>
+                  ))}
+              </select>
+            </div>
             <div>
               <span className="font-medium block mb-2">{t('musicVolume')}</span>
                 <input 
@@ -441,7 +458,7 @@ const Game: React.FC = () => {
         <Modal show={isAboutOpen} onClose={() => { setAboutOpen(false); audioManager.playSound('click'); }} title={t('aboutTitle')} theme={theme}>
           <div className="space-y-4 text-sm">
             <p>{t('aboutText1')}</p>
-            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.6.0'})}</p>
+            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.7.0'})}</p>
           </div>
         </Modal>
 

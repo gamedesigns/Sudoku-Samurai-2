@@ -33,6 +33,8 @@ export type ThemeName = 'light' | 'warm' | 'dark';
 
 export type SoundEvent = 'placeNumber' | 'delete' | 'error' | 'click';
 
+export type MusicProfile = 'Calm' | 'Powerful' | 'Level' | 'Mixed';
+
 export interface AppSettings {
     theme: ThemeName;
     highlightMode: boolean;
@@ -43,6 +45,7 @@ export interface AppSettings {
     musicVolume: number;
     sfxVolume: number;
     isMuted: boolean;
+    musicProfile: MusicProfile;
 }
 
 export interface Theme {

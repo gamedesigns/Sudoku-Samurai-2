@@ -1,8 +1,7 @@
-
 # Sudoku Samurai: Development Plan
 
 -   **Author**: Daniel Sandner
--   **Current Version**: v0.1.0
+-   **Current Version**: v0.2.0
 
 This document outlines the development roadmap for Sudoku Samurai, translating the ideas from the initial design document into a structured, phased implementation plan.
 
@@ -25,21 +24,21 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
 
 ---
 
-### Phase 2: Gameplay Polish & Core Logic (Target: v0.2.0)
+### ✅ Phase 2: Gameplay Polish & Core Logic (v0.2.0 - Complete)
 
 **Goal**: Enhance the core gameplay loop with essential features and prepare for advanced modes.
 
--   **Game Logic**:
-    -   Implement a Sudoku solver/validator engine to check for mistakes and puzzle completion.
-    -   Add a game state manager for tracking `new game`, `in progress`, and `completed` states.
-    -   Display a win screen/modal upon successful puzzle completion.
--   **User Features**:
-    -   Introduce a game timer.
-    -   Implement a "Pencil Marks" (notes) feature for users to jot down potential numbers in a cell.
-    -   Add a difficulty selector (Easy, Medium, Hard) that loads different puzzles.
--   **UI/UX Refinements**:
-    -   Add subtle animations for number placement and board interactions.
-    -   Create a "New Game" button/flow.
+-   [x] **Game Logic**:
+    -   [x] Implement a Sudoku validator engine to check for puzzle completion.
+    -   [x] Add a game state manager for tracking `new game`, `in progress`, and `completed` states.
+    -   [x] Display a win screen/modal upon successful puzzle completion.
+-   [x] **User Features**:
+    -   [x] Introduce a game timer.
+    -   [x] Implement a "Pencil Marks" (notes) feature for users to jot down potential numbers in a cell.
+    -   [x] Add a difficulty selector (Easy, Medium, Hard) that loads different puzzles.
+-   [x] **UI/UX Refinements**:
+    -   [x] Add subtle animations for number placement and board interactions.
+    -   [x] Create a "New Game" button/flow.
 
 ---
 

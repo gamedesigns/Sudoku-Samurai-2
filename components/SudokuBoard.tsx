@@ -1,10 +1,8 @@
-
 import React from 'react';
-import { Grid, Position, Theme } from '../types';
+import { Grid, Position, Theme, Cell } from '../types';
 
 interface SudokuBoardProps {
   grid: Grid;
-  originalGrid: Grid;
   selectedCell: Position;
   theme: Theme;
   highlightMode: boolean;
@@ -13,15 +11,13 @@ interface SudokuBoardProps {
 
 const SudokuBoard: React.FC<SudokuBoardProps> = ({
   grid,
-  originalGrid,
   selectedCell,
   theme,
   highlightMode,
   onCellClick,
 }) => {
-  const getCellClass = (row: number, col: number): string => {
-    const value = grid[row][col];
-    const isOriginal = originalGrid[row][col] !== 0;
+  const getCellClass = (row: number, col: number, cell: Cell): string => {
+    const { value, isOriginal } = cell;
     const isSelected = selectedCell?.[0] === row && selectedCell?.[1] === col;
     
     let isHighlighted = false;
@@ -30,12 +26,13 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
     if (highlightMode && selectedCell) {
         const [selectedRow, selectedCol] = selectedCell;
         isHighlighted = (
-            selectedRow === row ||
-            selectedCol === col ||
-            (Math.floor(selectedRow / 3) === Math.floor(row / 3) &&
-             Math.floor(selectedCol / 3) === Math.floor(col / 3))
+            !isSelected &&
+            (selectedRow === row ||
+             selectedCol === col ||
+             (Math.floor(selectedRow / 3) === Math.floor(row / 3) &&
+              Math.floor(selectedCol / 3) === Math.floor(col / 3)))
         );
-        const selectedValue = grid[selectedRow][selectedCol];
+        const selectedValue = grid[selectedRow][selectedCol].value;
         if (selectedValue !== 0 && selectedValue === value) {
             isSameNumber = true;
         }
@@ -43,7 +40,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
 
     const baseClasses = `
       w-full aspect-square flex items-center justify-center text-xl sm:text-2xl font-bold
-      transition-all duration-200 focus:outline-none
+      transition-all duration-200 focus:outline-none relative
     `;
 
     const borderClasses = `
@@ -60,8 +57,6 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
       stateClasses = `${theme.cellSelected} bg-opacity-70`;
     } else if (isHighlighted) {
       stateClasses = `${theme.cellHighlight}`;
-    } else if (value === 0) {
-      stateClasses = `${theme.cellEmpty} ${!isOriginal ? 'cursor-pointer' : ''}`;
     } else {
       stateClasses = `${theme.cellBg}`;
     }
@@ -79,10 +74,18 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
             <button
               key={`${rowIndex}-${colIndex}`}
               onClick={() => onCellClick(rowIndex, colIndex)}
-              disabled={originalGrid[rowIndex][colIndex] !== 0}
-              className={getCellClass(rowIndex, colIndex)}
+              disabled={cell.isOriginal}
+              className={getCellClass(rowIndex, colIndex, cell)}
             >
-              {cell !== 0 ? cell : ''}
+              {cell.value !== 0 ? cell.value : (
+                <div className={`grid grid-cols-3 w-full h-full text-[10px] sm:text-xs items-center justify-center leading-none ${theme.noteText} pointer-events-none`}>
+                  {Array.from({ length: 9 }, (_, i) => i + 1).map(n => (
+                    <div key={n} className="flex items-center justify-center">
+                      {cell.notes.has(n) ? n : ''}
+                    </div>
+                  ))}
+                </div>
+              )}
             </button>
           ))
         )}

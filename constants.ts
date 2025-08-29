@@ -1,7 +1,18 @@
+import { CellValue, Difficulty } from './types';
 
-import { Grid } from './types';
+const EASY_PUZZLE: CellValue[][] = [
+  [1, 2, 0, 4, 5, 6, 7, 8, 9],
+  [4, 5, 7, 0, 8, 9, 1, 2, 3],
+  [0, 8, 9, 1, 2, 3, 4, 5, 6],
+  [2, 1, 4, 3, 6, 5, 8, 9, 7],
+  [3, 6, 5, 8, 9, 7, 2, 1, 4],
+  [8, 9, 7, 2, 1, 4, 3, 6, 5],
+  [5, 3, 1, 6, 4, 2, 9, 7, 8],
+  [9, 7, 8, 0, 3, 1, 5, 4, 2],
+  [6, 4, 2, 5, 7, 8, 0, 3, 1],
+];
 
-export const INITIAL_GRID: Grid = [
+export const MEDIUM_PUZZLE: CellValue[][] = [
   [5, 3, 0, 0, 7, 0, 0, 0, 0],
   [6, 0, 0, 1, 9, 5, 0, 0, 0],
   [0, 9, 8, 0, 0, 0, 0, 6, 0],
@@ -12,3 +23,21 @@ export const INITIAL_GRID: Grid = [
   [0, 0, 0, 4, 1, 9, 0, 0, 5],
   [0, 0, 0, 0, 8, 0, 0, 7, 9],
 ];
+
+const HARD_PUZZLE: CellValue[][] = [
+  [8, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 3, 6, 0, 0, 0, 0, 0],
+  [0, 7, 0, 0, 9, 0, 2, 0, 0],
+  [0, 5, 0, 0, 0, 7, 0, 0, 0],
+  [0, 0, 0, 0, 4, 5, 7, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0, 3, 0],
+  [0, 0, 1, 0, 0, 0, 0, 6, 8],
+  [0, 0, 8, 5, 0, 0, 0, 1, 0],
+  [0, 9, 0, 0, 0, 0, 4, 0, 0],
+];
+
+export const PUZZLES: Record<Difficulty, CellValue[][]> = {
+    Easy: EASY_PUZZLE,
+    Medium: MEDIUM_PUZZLE,
+    Hard: HARD_PUZZLE,
+};

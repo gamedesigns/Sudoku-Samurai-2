@@ -1,7 +1,15 @@
-
 export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export type Grid = CellValue[][];
 export type Position = [number, number] | null;
+
+export type Cell = {
+  value: CellValue;
+  notes: Set<number>;
+  isOriginal: boolean;
+};
+
+export type Grid = Cell[][];
+
+export type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
 export interface Theme {
   bg: string;
@@ -20,4 +28,5 @@ export interface Theme {
   userText: string;
   toggleBg: string;
   toggleBgActive: string;
+  noteText: string;
 }

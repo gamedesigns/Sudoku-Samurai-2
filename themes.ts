@@ -1,4 +1,3 @@
-
 import { Theme } from './types';
 
 export const lightTheme: Theme = {
@@ -17,7 +16,8 @@ export const lightTheme: Theme = {
   originalText: 'text-gray-900',
   userText: 'text-blue-600',
   toggleBg: 'bg-gray-300',
-  toggleBgActive: 'bg-red-500'
+  toggleBgActive: 'bg-red-500',
+  noteText: 'text-amber-800'
 };
 
 export const darkTheme: Theme = {
@@ -36,5 +36,6 @@ export const darkTheme: Theme = {
   originalText: 'text-white',
   userText: 'text-cyan-400',
   toggleBg: 'bg-gray-500',
-  toggleBgActive: 'bg-blue-500'
+  toggleBgActive: 'bg-blue-500',
+  noteText: 'text-cyan-500'
 };

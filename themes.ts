@@ -21,6 +21,7 @@ export const lightTheme: Theme = {
   cellErrorBg: 'bg-red-200',
   cellErrorText: 'text-red-700 font-bold',
   cellHintBorder: 'border-green-500',
+  tutorBg: 'bg-green-100 border-green-300',
 };
 
 export const darkTheme: Theme = {
@@ -44,4 +45,5 @@ export const darkTheme: Theme = {
   cellErrorBg: 'bg-red-900/50',
   cellErrorText: 'text-red-400 font-bold',
   cellHintBorder: 'border-green-400',
+  tutorBg: 'bg-green-900/50 border-green-700',
 };

@@ -1,32 +1,29 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb } from 'lucide-react';
 
-import { PUZZLES } from './constants';
+import { getRandomPuzzle, hasPuzzles } from './constants';
 import { lightTheme, darkTheme } from './themes';
-import { Grid, Position, CellValue, Difficulty, Cell } from './types';
+import { Grid, Position, CellValue, Cell, GameConfig, Hint, Difficulty } from './types';
 import { generateInitialGrid, checkWin, formatTime, solveSudoku } from './utils';
+import { findHint } from './solver/techniques';
 
 import Modal from './components/Modal';
 import SudokuBoard from './components/SudokuBoard';
 import NumberPad from './components/NumberPad';
 import Header from './components/Header';
+import HintTutor from './components/HintTutor';
 
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
-import { DEFAULT_SETTINGS, LANGUAGES, AppSettings } from './config';
+import { DEFAULT_SETTINGS, LANGUAGES, AppSettings, GAME_MODES, DEFAULT_GAME_CONFIG } from './config';
 
 
 type GameState = 'new' | 'inprogress' | 'completed';
 type InputMode = 'normal' | 'notes';
 
-const getRandomPuzzle = (difficulty: Difficulty): CellValue[][] => {
-  const puzzleSet = PUZZLES[difficulty];
-  return puzzleSet[Math.floor(Math.random() * puzzleSet.length)];
-};
-
 const Game: React.FC = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
-  const { darkMode, highlightMode, language, mistakeChecker } = settings;
+  const { darkMode, highlightMode, language, mistakeChecker, gameConfig } = settings;
   const { t, setLang, lang } = useI18n();
 
   useEffect(() => {
@@ -35,10 +32,9 @@ const Game: React.FC = () => {
     }
   }, [language, lang, setLang]);
   
-  const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
-  const [grid, setGrid] = useState<Grid>(() => generateInitialGrid(getRandomPuzzle(difficulty)));
+  const [grid, setGrid] = useState<Grid | null>(null);
   const [solvedGrid, setSolvedGrid] = useState<Grid | null>(null);
-  const [selectedCell, setSelectedCell] = useState<Position>(null);
+  const [selectedCell, setSelectedCell] = useState<Position | null>(null);
   
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
@@ -47,11 +43,13 @@ const Game: React.FC = () => {
   const [isNewGameOpen, setNewGameOpen] = useState(false);
   const [isWinModalOpen, setWinModalOpen] = useState(false);
 
-  const [gameState, setGameState] = useState<GameState>('inprogress');
+  const [gameState, setGameState] = useState<GameState>('new');
   const [time, setTime] = useState(0);
   const [inputMode, setInputMode] = useState<InputMode>('normal');
   const [incorrectCells, setIncorrectCells] = useState<Set<string>>(new Set());
-  const [hint, setHint] = useState<Position>(null);
+  const [hint, setHint] = useState<Hint>(null);
+  
+  const [tempGameConfig, setTempGameConfig] = useState<GameConfig>(gameConfig);
 
   const theme = darkMode ? darkTheme : lightTheme;
 
@@ -68,15 +66,20 @@ const Game: React.FC = () => {
   }, [gameState]);
   
   useEffect(() => {
-    startNewGame(difficulty);
+    startNewGame(gameConfig);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const startNewGame = useCallback((newDifficulty: Difficulty) => {
-    const puzzle = getRandomPuzzle(newDifficulty);
-    const initialGrid = generateInitialGrid(puzzle);
+  const startNewGame = useCallback((newConfig: GameConfig) => {
+    const puzzle = getRandomPuzzle(newConfig);
+    if (!puzzle) {
+        console.error("No puzzle found for this configuration:", newConfig);
+        alert(t('noPuzzleError'));
+        return;
+    }
+    const initialGrid = generateInitialGrid(puzzle, newConfig);
     setGrid(initialGrid);
-    setSolvedGrid(solveSudoku(initialGrid));
-    setDifficulty(newDifficulty);
+    setSolvedGrid(solveSudoku(initialGrid, newConfig));
+    setSettings(s => ({ ...s, gameConfig: newConfig}));
     setSelectedCell(null);
     setGameState('inprogress');
     setTime(0);
@@ -85,18 +88,22 @@ const Game: React.FC = () => {
     setNewGameOpen(false);
     setIncorrectCells(new Set());
     setHint(null);
-  }, []);
+  }, [setSettings, t]);
 
   const handleCellClick = useCallback((row: number, col: number) => {
-    if (grid[row][col].isOriginal) return;
+    if (!grid || grid[row][col].isOriginal) return;
     setSelectedCell(p => p && p[0] === row && p[1] === col ? null : [row, col]);
   }, [grid]);
   
   const checkMistakes = useCallback((currentGrid: Grid) => {
-    if (!mistakeChecker || !solvedGrid) return;
+    if (!mistakeChecker || !solvedGrid) {
+        setIncorrectCells(new Set());
+        return;
+    }
     const newIncorrectCells = new Set<string>();
-    for(let r=0; r<9; r++) {
-        for (let c=0; c<9; c++) {
+    const size = currentGrid.length;
+    for(let r=0; r < size; r++) {
+        for (let c=0; c < size; c++) {
             const cell = currentGrid[r][c];
             if (!cell.isOriginal && cell.value !== 0 && cell.value !== solvedGrid[r][c].value) {
                 newIncorrectCells.add(`${r}-${c}`);
@@ -107,7 +114,7 @@ const Game: React.FC = () => {
   }, [mistakeChecker, solvedGrid]);
 
   const handleNumberClick = useCallback((number: CellValue) => {
-    if (!selectedCell || gameState !== 'inprogress') return;
+    if (!selectedCell || !grid || gameState !== 'inprogress') return;
     setHint(null);
     
     const [row, col] = selectedCell;
@@ -130,15 +137,15 @@ const Game: React.FC = () => {
     setGrid(newGrid);
     checkMistakes(newGrid);
 
-    if (inputMode === 'normal' && checkWin(newGrid)) {
+    if (inputMode === 'normal' && checkWin(newGrid, gameConfig)) {
         setGameState('completed');
         setWinModalOpen(true);
     }
 
-  }, [selectedCell, grid, inputMode, gameState, checkMistakes]);
+  }, [selectedCell, grid, inputMode, gameState, checkMistakes, gameConfig]);
   
   const handleDeleteClick = useCallback(() => {
-    if (!selectedCell || gameState !== 'inprogress') return;
+    if (!selectedCell || !grid || gameState !== 'inprogress') return;
 
     const [row, col] = selectedCell;
     if (grid[row][col].isOriginal) return;
@@ -151,39 +158,35 @@ const Game: React.FC = () => {
   }, [selectedCell, grid, gameState, checkMistakes]);
   
   const handleHintClick = useCallback(() => {
-    if (gameState !== 'inprogress' || !solvedGrid) return;
+    if (gameState !== 'inprogress' || !solvedGrid || !grid) return;
 
     if (hint) {
-        const [row, col] = hint;
-        const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
-        newGrid[row][col].value = solvedGrid[row][col].value;
-        newGrid[row][col].notes.clear();
-        setGrid(newGrid);
-        checkMistakes(newGrid);
-        setHint(null);
-        setSelectedCell(hint);
-        if (checkWin(newGrid)) {
-            setGameState('completed');
-            setWinModalOpen(true);
-        }
-        return;
-    }
-
-    const emptyCells: [number, number][] = [];
-    for(let r=0; r<9; r++) {
-        for(let c=0; c<9; c++) {
-            if(grid[r][c].value === 0) {
-                emptyCells.push([r,c]);
+        if (hint.stage === 'nudge') {
+            setHint({ ...hint, stage: 'tutor'});
+        } else if (hint.stage === 'tutor') {
+            const [row, col] = hint.position;
+            const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
+            newGrid[row][col].value = solvedGrid[row][col].value;
+            newGrid[row][col].notes.clear();
+            setGrid(newGrid);
+            checkMistakes(newGrid);
+            setHint(null);
+            if (checkWin(newGrid, gameConfig)) {
+                setGameState('completed');
+                setWinModalOpen(true);
             }
         }
+    } else {
+        const foundHint = findHint(grid, gameConfig);
+        if (foundHint) {
+            setHint({ ...foundHint, stage: 'nudge' });
+            setSelectedCell(foundHint.position);
+        } else {
+            // No hint found (or maybe show a message)
+            console.log("No simple hint available.");
+        }
     }
-
-    if(emptyCells.length > 0) {
-        const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        setHint(randomCell);
-        setSelectedCell(randomCell);
-    }
-  }, [gameState, solvedGrid, grid, hint, checkMistakes]);
+  }, [gameState, solvedGrid, grid, hint, checkMistakes, gameConfig]);
 
   const closeAllModals = () => {
       setSettingsOpen(false);
@@ -195,6 +198,7 @@ const Game: React.FC = () => {
 
   const handleResetSettings = () => {
     setSettings(DEFAULT_SETTINGS);
+    startNewGame(DEFAULT_GAME_CONFIG);
     closeAllModals();
   };
   
@@ -209,6 +213,10 @@ const Game: React.FC = () => {
       </div>
   );
 
+  if (!grid) {
+      return <div>Loading...</div>; // Or a proper loading screen
+  }
+
   return (
     <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text}`}>
       <div className="relative max-w-lg mx-auto flex flex-col min-h-screen">
@@ -217,7 +225,7 @@ const Game: React.FC = () => {
         {isMenuOpen && (
           <div className={`absolute top-20 right-4 ${theme.cardBg} rounded-2xl shadow-xl z-40 border-2 ${theme.border} overflow-hidden w-48`}>
              <button
-              onClick={() => { setNewGameOpen(true); setMenuOpen(false); }}
+              onClick={() => { setTempGameConfig(gameConfig); setNewGameOpen(true); setMenuOpen(false); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Play className="w-5 h-5" />
@@ -254,13 +262,14 @@ const Game: React.FC = () => {
           </div>
         )}
 
-        <main className="flex-grow flex flex-col justify-center p-4 space-y-4">
+        <main className="flex-grow flex flex-col justify-center p-2 sm:p-4 space-y-4">
           <div className="flex justify-between items-center px-2">
-            <div className="text-sm font-medium">{t('difficulty')}: {t(difficulty.toLowerCase())}</div>
+            <div className="text-sm font-medium">{t(gameConfig.mode)} • {t(gameConfig.difficulty.toLowerCase())}</div>
             <div className="text-lg font-semibold tabular-nums">{formatTime(time)}</div>
           </div>
           <SudokuBoard 
             grid={grid}
+            gameConfig={gameConfig}
             selectedCell={selectedCell}
             theme={theme}
             highlightMode={highlightMode}
@@ -273,6 +282,7 @@ const Game: React.FC = () => {
             <div className="flex items-center w-full max-w-md mx-auto space-x-2 sm:space-x-3">
               <NumberPad
                 theme={theme}
+                gameConfig={gameConfig}
                 onNumberClick={handleNumberClick}
                 onDeleteClick={handleDeleteClick}
               />
@@ -283,6 +293,10 @@ const Game: React.FC = () => {
           </div>
         </main>
         
+        {hint && hint.stage === 'tutor' && (
+            <HintTutor hint={hint} theme={theme} />
+        )}
+
         <Modal show={isSettingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings')} theme={theme}>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -338,18 +352,77 @@ const Game: React.FC = () => {
         <Modal show={isAboutOpen} onClose={() => setAboutOpen(false)} title={t('aboutTitle')} theme={theme}>
           <div className="space-y-4 text-sm">
             <p>{t('aboutText1')}</p>
-            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.3.0'})}</p>
+            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.4.0'})}</p>
           </div>
         </Modal>
 
         <Modal show={isNewGameOpen} onClose={() => setNewGameOpen(false)} title={t('newGame')} theme={theme}>
-            <div className="space-y-3 text-center">
-                <p className="mb-4">{t('newGameText')}</p>
-                {(['Novice', 'Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
-                    <button key={diff} onClick={() => startNewGame(diff)} className={`w-full p-4 rounded-xl font-bold transition-colors ${theme.button}`}>
-                        {t(diff.toLowerCase())}
-                    </button>
-                ))}
+            <div className="space-y-4">
+                <div>
+                    <label className="font-medium block mb-2">{t('gameMode')}</label>
+                    <select
+                        value={`${tempGameConfig.mode}-${tempGameConfig.size}`}
+                        onChange={(e) => {
+                            const [mode, sizeStr] = e.target.value.split('-');
+                            const size = Number(sizeStr) as GameConfig['size'];
+                            const newMode = mode as GameConfig['mode'];
+
+                            const difficulties = ['Novice', 'Easy', 'Medium', 'Hard'] as const;
+                            const firstAvailableDifficulty = difficulties.find(diff => 
+                                hasPuzzles({ mode: newMode, size, difficulty: diff })
+                            );
+                            
+                            setTempGameConfig({
+                                mode: newMode,
+                                size: size,
+                                difficulty: firstAvailableDifficulty || tempGameConfig.difficulty
+                            });
+                        }}
+                        className={`w-full p-3 rounded-lg border-2 ${theme.border} ${theme.cardBg} focus:outline-none focus:ring-2 focus:ring-red-400`}
+                    >
+                        {GAME_MODES.map(gm => (
+                            <option key={`${gm.mode}-${gm.size}`} value={`${gm.mode}-${gm.size}`}>{t(gm.nameKey)}</option>
+                        ))}
+                    </select>
+                </div>
+                 <div>
+                    <label className="font-medium block mb-2">{t('difficulty')}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {(['Novice', 'Easy', 'Medium', 'Hard'] as const).map(diff => {
+                            const isAvailable = hasPuzzles({
+                                mode: tempGameConfig.mode,
+                                size: tempGameConfig.size,
+                                difficulty: diff
+                            });
+                            return (
+                                <button 
+                                    key={diff} 
+                                    onClick={() => {
+                                        if (isAvailable) {
+                                            setTempGameConfig(c => ({...c, difficulty: diff}));
+                                        }
+                                    }}
+                                    disabled={!isAvailable}
+                                    className={`p-3 rounded-lg font-bold transition-colors border-2 ${
+                                        tempGameConfig.difficulty === diff 
+                                            ? 'bg-red-500 text-white border-red-500' 
+                                            : isAvailable 
+                                                ? `${theme.button} border-transparent`
+                                                : `${theme.button} border-transparent opacity-40 cursor-not-allowed`
+                                    }`}
+                                >
+                                    {t(diff.toLowerCase())}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
+                <button
+                    onClick={() => startNewGame(tempGameConfig)}
+                    className={`w-full mt-4 p-4 rounded-xl font-bold transition-colors ${theme.numberButton} text-white`}
+                >
+                    {t('play')}
+                </button>
             </div>
         </Modal>
 
@@ -358,14 +431,12 @@ const Game: React.FC = () => {
                 <Award className="w-16 h-16 mx-auto text-amber-500" strokeWidth={1.5} />
                 <p className="text-lg">{t('winText')}</p>
                 <p className="text-2xl font-bold">{formatTime(time)}</p>
-                <p className="pt-4">{t('winPlayAgain')}</p>
-                <div className="grid grid-cols-2 gap-2">
-                    {(['Novice', 'Easy', 'Medium', 'Hard'] as Difficulty[]).map(diff => (
-                        <button key={diff} onClick={() => startNewGame(diff)} className={`w-full p-3 rounded-xl font-bold transition-colors ${theme.button}`}>
-                            {t(diff.toLowerCase())}
-                        </button>
-                    ))}
-                </div>
+                <button
+                    onClick={() => setNewGameOpen(true)}
+                    className={`w-full mt-4 p-4 rounded-xl font-bold transition-colors ${theme.numberButton} text-white`}
+                >
+                    {t('winPlayAgain')}
+                </button>
             </div>
         </Modal>
 

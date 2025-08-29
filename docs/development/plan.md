@@ -1,7 +1,7 @@
 # Sudoku Samurai: Development Plan
 
 -   **Author**: Daniel Sandner
--   **Current Version**: v0.3.0
+-   **Current Version**: v0.4.0
 
 This document outlines the development roadmap for Sudoku Samurai, translating the ideas from the initial design document into a structured, phased implementation plan.
 
@@ -42,36 +42,36 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
 
 ---
 
-### 🚧 Phase 3: The Guiding Sensei - Settings & Hints (In Progress)
+### ✅ Phase 3: The Guiding Sensei - Settings & Hints (v0.4.0 - Complete)
 
 **Goal**: Implement an innovative hint system and add robust settings management.
 
--   **Settings & Internationalization (i18n)**:
+-   [x] **Settings & Internationalization (i18n)**:
     -   [x] Added "Novice" difficulty level.
     -   [x] Implemented language selection (English, Czech, German).
     -   [x] User settings (theme, language, etc.) are now persisted in the browser.
     -   [x] Added a "Reset to Default" option.
--   **Hint System & Feedback Tools**:
+-   [x] **Hint System & Feedback Tools**:
     -   [x] Implemented optional "Mistake Checker" to highlight incorrect entries in real-time.
-    -   [x] Implemented "Path of Logic" hints (Level 1 & 3):
-        -   [x] **Gentle Nudge**: Highlights a solvable cell.
-        -   [x] **Master's Insight**: Fills the cell with the correct number.
--   **Upcoming in this Phase**:
-    -   **Level 2: Technique Tutor**: Explain *why* the hint is correct (e.g., "Hidden Single").
+    -   [x] Implemented "Path of Logic" hints:
+        -   [x] **Level 1: Gentle Nudge**: Highlights a solvable cell.
+        -   [x] **Level 2: Technique Tutor**: Explains *why* the hint is correct (e.g., "Naked Single", "Hidden Single").
+        -   [x] **Level 3: Master's Insight**: Fills the cell with the correct number.
 
 ---
 
-### Phase 4: The Dojo - New Game Modes (Target: v0.4.0)
+### 🚧 Phase 4: The Dojo - New Game Modes (In Progress)
 
 **Goal**: Introduce the first set of innovative and variant game modes.
 
 -   **New Modes**:
-    -   **Katana Kutsurogi (Relaxation Mode)**:
-        -   Implement smaller grids (4x4, 6x6).
-        -   Add a "Color Sudoku" option as a visual puzzle alternative.
-    -   **Variant Dojo (Part 1)**:
-        -   Implement **X-Sudoku (Diagonal Sudoku)**, where main diagonals must also be valid.
-        -   Implement **Hyper Sudoku**, with its four extra interior regions.
+    -   [x] **Katana Kutsurogi (Relaxation Mode)**:
+        -   [x] Implement smaller grids (4x4, 6x6).
+    -   [x] **Variant Dojo (Part 1)**:
+        -   [x] Implement **X-Sudoku (Diagonal Sudoku)**, where main diagonals must also be valid.
+-   **Upcoming in this Phase**:
+    -   Implement **Hyper Sudoku**, with its four extra interior regions.
+    -   Add a "Color Sudoku" option as a visual puzzle alternative.
 
 ---
 

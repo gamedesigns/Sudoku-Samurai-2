@@ -1,17 +1,21 @@
 import React from 'react';
-import { CellValue, Theme } from '../types';
+import { CellValue, GameConfig, Theme } from '../types';
 
 interface NumberPadProps {
   theme: Theme;
+  gameConfig: GameConfig;
   onNumberClick: (num: CellValue) => void;
   onDeleteClick: () => void;
 }
 
-const NumberPad: React.FC<NumberPadProps> = ({ theme, onNumberClick, onDeleteClick }) => {
+const NumberPad: React.FC<NumberPadProps> = ({ theme, gameConfig, onNumberClick, onDeleteClick }) => {
+  const { size } = gameConfig;
+  const gridCols = size === 9 ? 'grid-cols-5' : size === 6 ? 'grid-cols-4' : 'grid-cols-3';
+
   return (
     <div className={`w-full ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 border-2 ${theme.border}`}>
-      <div className="grid grid-cols-5 gap-2 sm:gap-3">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+      <div className={`grid ${gridCols} gap-2 sm:gap-3`}>
+        {Array.from({ length: size }, (_, i) => i + 1).map((number) => (
           <button
             key={number}
             onClick={() => onNumberClick(number as CellValue)}

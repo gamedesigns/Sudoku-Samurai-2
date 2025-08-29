@@ -1,5 +1,5 @@
 export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export type Position = [number, number] | null;
+export type Position = [number, number];
 
 export type Cell = {
   value: CellValue;
@@ -11,6 +11,23 @@ export type Grid = Cell[][];
 
 export type Difficulty = 'Novice' | 'Easy' | 'Medium' | 'Hard';
 export type Language = 'en' | 'cs' | 'de';
+
+export type GameMode = 'Classic' | 'X-Sudoku';
+export type GridSize = 4 | 6 | 9;
+
+export interface GameConfig {
+    size: GridSize;
+    mode: GameMode;
+    difficulty: Difficulty;
+}
+
+export type HintTechnique = 'Naked Single' | 'Hidden Single';
+
+export type Hint = {
+    position: Position;
+    technique: HintTechnique;
+    stage: 'nudge' | 'tutor' | 'reveal';
+} | null;
 
 export interface Theme {
   bg: string;
@@ -33,4 +50,5 @@ export interface Theme {
   cellErrorBg: string;
   cellErrorText: string;
   cellHintBorder: string;
+  tutorBg: string;
 }

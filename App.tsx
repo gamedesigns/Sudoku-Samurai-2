@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb, Flame } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Menu, X, Settings, Info, Palette, Sun, Moon, Award, Play, RefreshCw, Lightbulb, Flame, Volume2, VolumeX } from 'lucide-react';
 
 import { getRandomPuzzle, hasPuzzles } from './constants';
 import { lightTheme, darkTheme, warmTheme } from './themes';
-import { Grid, Position, CellValue, Cell, GameConfig, Hint, Difficulty, AppSettings, ThemeName } from './types';
+import { Grid, Position, CellValue, Cell, GameConfig, Hint, AppSettings, SoundEvent } from './types';
 import { generateInitialGrid, checkWin, formatTime, solveSudoku } from './utils';
 import { findHint } from './solver/techniques';
 
@@ -16,6 +16,7 @@ import HintTutor from './components/HintTutor';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { I18nProvider, useI18n } from './i18n/I18nProvider';
 import { DEFAULT_SETTINGS, LANGUAGES, GAME_MODES, DEFAULT_GAME_CONFIG } from './config';
+import { audioManager } from './audio/AudioManager';
 
 
 type GameState = 'new' | 'inprogress' | 'completed';
@@ -23,8 +24,9 @@ type InputMode = 'normal' | 'notes';
 
 const Game: React.FC = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('sudokuSettings', DEFAULT_SETTINGS);
-  const { theme: themeName, highlightMode, language, mistakeChecker, gameConfig, startFullscreen } = settings;
+  const { theme: themeName, highlightMode, language, mistakeChecker, gameConfig, startFullscreen, musicVolume, sfxVolume, isMuted } = settings;
   const { t, setLang, lang } = useI18n();
+  const isInitialized = useRef(false);
 
   useEffect(() => {
     if (lang !== language) {
@@ -53,6 +55,19 @@ const Game: React.FC = () => {
 
   const themes = { light: lightTheme, warm: warmTheme, dark: darkTheme };
   const theme = themes[themeName];
+  
+  const initializeAudio = useCallback(() => {
+    if (!audioManager.isInitialized) {
+        audioManager.initialize();
+        audioManager.loadAll();
+    }
+  }, []);
+
+  useEffect(() => {
+      audioManager.setMusicVolume(musicVolume);
+      audioManager.setSfxVolume(sfxVolume);
+      audioManager.setMuted(isMuted);
+  }, [musicVolume, sfxVolume, isMuted]);
 
   useEffect(() => {
     let timerId: number;
@@ -67,10 +82,14 @@ const Game: React.FC = () => {
   }, [gameState]);
   
   useEffect(() => {
-    startNewGame(gameConfig, false); // Don't request fullscreen on initial load
+    if (!isInitialized.current) {
+      startNewGame(gameConfig, false); // Don't request fullscreen on initial load
+      isInitialized.current = true;
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startNewGame = useCallback((newConfig: GameConfig, requestFS: boolean = true) => {
+    initializeAudio();
     if (requestFS && startFullscreen) {
         document.documentElement.requestFullscreen().catch(err => {
             console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
@@ -94,30 +113,37 @@ const Game: React.FC = () => {
     setNewGameOpen(false);
     setIncorrectCells(new Set());
     setHint(null);
-  }, [setSettings, t, startFullscreen]);
+    audioManager.playMusic('background');
+  }, [setSettings, t, startFullscreen, initializeAudio]);
 
   const handleCellClick = useCallback((row: number, col: number) => {
+    audioManager.playSound('click');
     if (!grid || grid[row][col].isOriginal) return;
     setSelectedCell(p => p && p[0] === row && p[1] === col ? null : [row, col]);
   }, [grid]);
   
-  const checkMistakes = useCallback((currentGrid: Grid) => {
+  const checkMistakes = useCallback((currentGrid: Grid, playSound: boolean = false) => {
     if (!mistakeChecker || !solvedGrid) {
         setIncorrectCells(new Set());
         return;
     }
     const newIncorrectCells = new Set<string>();
     const size = currentGrid.length;
+    let hadError = false;
     for(let r=0; r < size; r++) {
         for (let c=0; c < size; c++) {
             const cell = currentGrid[r][c];
             if (!cell.isOriginal && cell.value !== 0 && cell.value !== solvedGrid[r][c].value) {
                 newIncorrectCells.add(`${r}-${c}`);
+                hadError = true;
             }
         }
     }
+    if (playSound && hadError && newIncorrectCells.size > incorrectCells.size) {
+        audioManager.playSound('error');
+    }
     setIncorrectCells(newIncorrectCells);
-  }, [mistakeChecker, solvedGrid]);
+  }, [mistakeChecker, solvedGrid, incorrectCells.size]);
 
   const handleNumberClick = useCallback((number: CellValue) => {
     if (!selectedCell || !grid || gameState !== 'inprogress') return;
@@ -129,6 +155,7 @@ const Game: React.FC = () => {
 
     if (inputMode === 'notes') {
         if(cell.value === 0) {
+            audioManager.playSound('click');
             if (cell.notes.has(number)) {
                 cell.notes.delete(number);
             } else {
@@ -136,16 +163,24 @@ const Game: React.FC = () => {
             }
         }
     } else {
-        cell.value = cell.value === number ? 0 : number;
+        const oldValue = cell.value;
+        cell.value = oldValue === number ? 0 : number;
         cell.notes.clear();
+        
+        if (cell.value === 0) {
+          audioManager.playSound('delete');
+        } else if (cell.value !== oldValue) {
+          audioManager.playSound('placeNumber');
+        }
     }
     
     setGrid(newGrid);
-    checkMistakes(newGrid);
+    checkMistakes(newGrid, inputMode === 'normal');
 
     if (inputMode === 'normal' && checkWin(newGrid, gameConfig)) {
         setGameState('completed');
         setWinModalOpen(true);
+        audioManager.playVictoryMusic();
     }
 
   }, [selectedCell, grid, inputMode, gameState, checkMistakes, gameConfig]);
@@ -156,6 +191,7 @@ const Game: React.FC = () => {
     const [row, col] = selectedCell;
     if (grid[row][col].isOriginal) return;
     
+    audioManager.playSound('delete');
     setHint(null);
     const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
     newGrid[row][col].value = 0;
@@ -165,7 +201,7 @@ const Game: React.FC = () => {
 
   const revealHint = useCallback(() => {
     if (!hint || !grid || !solvedGrid) return;
-
+    audioManager.playSound('placeNumber');
     const [row, col] = hint.position;
     const newGrid = grid.map(r => r.map(c => ({...c, notes: new Set(c.notes)})));
     newGrid[row][col].value = solvedGrid[row][col].value;
@@ -176,12 +212,13 @@ const Game: React.FC = () => {
     if (checkWin(newGrid, gameConfig)) {
         setGameState('completed');
         setWinModalOpen(true);
+        audioManager.playVictoryMusic();
     }
   }, [hint, grid, solvedGrid, checkMistakes, gameConfig]);
   
   const handleHintClick = useCallback(() => {
     if (gameState !== 'inprogress' || !grid) return;
-
+    audioManager.playSound('click');
     if (hint && hint.stage === 'nudge') {
         setHint({ ...hint, stage: 'tutor'});
     } else {
@@ -204,6 +241,7 @@ const Game: React.FC = () => {
   };
 
   const handleResetSettings = () => {
+    audioManager.playSound('click');
     setSettings(DEFAULT_SETTINGS);
     startNewGame(DEFAULT_GAME_CONFIG);
     closeAllModals();
@@ -211,42 +249,48 @@ const Game: React.FC = () => {
   
   const ModeToggle: React.FC = () => (
       <div className={`flex items-center justify-center p-1 rounded-full ${theme.cardBg} border-2 ${theme.border} shadow-inner`}>
-          <button onClick={() => setInputMode('normal')} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'normal' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
+          <button onClick={() => { setInputMode('normal'); audioManager.playSound('click'); }} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'normal' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
               {t('number')}
           </button>
-          <button onClick={() => setInputMode('notes')} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'notes' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
+          <button onClick={() => { setInputMode('notes'); audioManager.playSound('click'); }} className={`px-4 py-2 w-28 text-sm font-bold rounded-full transition-all ${inputMode === 'notes' ? `${theme.numberButton} text-white shadow` : `${theme.text} opacity-70`}`}>
               {t('notes')}
           </button>
       </div>
   );
 
   if (!grid) {
-      return <div>Loading...</div>; // Or a proper loading screen
+      return <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text} flex items-center justify-center`}>Loading...</div>;
   }
 
   return (
-    <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text}`}>
+    <div className={`min-h-screen w-full font-sans transition-colors duration-300 ${theme.bg} ${theme.text}`} onClick={initializeAudio}>
       <div className="relative max-w-5xl mx-auto flex flex-col min-h-screen">
-        <Header theme={theme} isMenuOpen={isMenuOpen} onMenuToggle={() => setMenuOpen(!isMenuOpen)} />
+        <Header 
+            theme={theme} 
+            isMenuOpen={isMenuOpen} 
+            onMenuToggle={() => { setMenuOpen(!isMenuOpen); audioManager.playSound('click'); }}
+            isMuted={isMuted}
+            onMuteToggle={() => { setSettings(s => ({ ...s, isMuted: !s.isMuted })); audioManager.playSound('click'); }}
+        />
 
         {isMenuOpen && (
           <div className={`absolute top-20 right-4 ${theme.cardBg} rounded-2xl shadow-xl z-50 border-2 ${theme.border} overflow-hidden w-48`}>
              <button
-              onClick={() => { setTempGameConfig(gameConfig); setNewGameOpen(true); setMenuOpen(false); }}
+              onClick={() => { setTempGameConfig(gameConfig); setNewGameOpen(true); setMenuOpen(false); audioManager.playSound('click'); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Play className="w-5 h-5" />
               <span>{t('newGame')}</span>
             </button>
             <button
-              onClick={() => { setSettingsOpen(true); setMenuOpen(false); }}
+              onClick={() => { setSettingsOpen(true); setMenuOpen(false); audioManager.playSound('click'); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Settings className="w-5 h-5" />
               <span>{t('settings')}</span>
             </button>
             <button
-              onClick={() => { setThemesOpen(true); setMenuOpen(false); }}
+              onClick={() => { setThemesOpen(true); setMenuOpen(false); audioManager.playSound('click'); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Palette className="w-5 h-5" />
@@ -260,7 +304,7 @@ const Game: React.FC = () => {
               <span>{t('resetSettings')}</span>
             </button>
             <button
-              onClick={() => { setAboutOpen(true); setMenuOpen(false); }}
+              onClick={() => { setAboutOpen(true); setMenuOpen(false); audioManager.playSound('click'); }}
               className={`w-full px-4 py-3 flex items-center space-x-3 text-left transition-colors ${theme.button}`}
             >
               <Info className="w-5 h-5" />
@@ -305,15 +349,15 @@ const Game: React.FC = () => {
         </main>
         
         {hint && hint.stage === 'tutor' && (
-            <HintTutor hint={hint} theme={theme} onClose={() => setHint(null)} onReveal={revealHint} />
+            <HintTutor hint={hint} theme={theme} onClose={() => { setHint(null); audioManager.playSound('click'); }} onReveal={revealHint} />
         )}
 
-        <Modal show={isSettingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings')} theme={theme}>
+        <Modal show={isSettingsOpen} onClose={() => { setSettingsOpen(false); audioManager.playSound('click'); }} title={t('settings')} theme={theme}>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <span className="font-medium">{t('highlightMode')}</span>
               <button
-                onClick={() => setSettings(s => ({ ...s, highlightMode: !s.highlightMode }))}
+                onClick={() => { setSettings(s => ({ ...s, highlightMode: !s.highlightMode })); audioManager.playSound('click'); }}
                 className={`w-12 h-6 rounded-full transition-colors ${highlightMode ? theme.toggleBgActive : theme.toggleBg} relative`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${highlightMode ? 'translate-x-6' : 'translate-x-0.5'}`} />
@@ -322,7 +366,7 @@ const Game: React.FC = () => {
             <div className="flex justify-between items-center">
               <span className="font-medium">{t('mistakeChecker')}</span>
               <button
-                onClick={() => setSettings(s => ({ ...s, mistakeChecker: !s.mistakeChecker }))}
+                onClick={() => { setSettings(s => ({ ...s, mistakeChecker: !s.mistakeChecker })); audioManager.playSound('click'); }}
                 className={`w-12 h-6 rounded-full transition-colors ${mistakeChecker ? theme.toggleBgActive : theme.toggleBg} relative`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${mistakeChecker ? 'translate-x-6' : 'translate-x-0.5'}`} />
@@ -331,17 +375,35 @@ const Game: React.FC = () => {
              <div className="flex justify-between items-center">
               <span className="font-medium">{t('startFullscreen')}</span>
               <button
-                onClick={() => setSettings(s => ({ ...s, startFullscreen: !s.startFullscreen }))}
+                onClick={() => { setSettings(s => ({ ...s, startFullscreen: !s.startFullscreen })); audioManager.playSound('click'); }}
                 className={`w-12 h-6 rounded-full transition-colors ${startFullscreen ? theme.toggleBgActive : theme.toggleBg} relative`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${startFullscreen ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
             <div>
+              <span className="font-medium block mb-2">{t('musicVolume')}</span>
+                <input 
+                  type="range" min="0" max="1" step="0.05"
+                  value={musicVolume}
+                  onChange={(e) => setSettings(s => ({ ...s, musicVolume: parseFloat(e.target.value)}))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+            </div>
+            <div>
+              <span className="font-medium block mb-2">{t('sfxVolume')}</span>
+                <input 
+                  type="range" min="0" max="1" step="0.05"
+                  value={sfxVolume}
+                  onChange={(e) => setSettings(s => ({ ...s, sfxVolume: parseFloat(e.target.value)}))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+            </div>
+            <div>
               <span className="font-medium block mb-2">{t('language')}</span>
               <div className="flex space-x-2">
                 {LANGUAGES.map(({ code, name }) => (
-                    <button key={code} onClick={() => setSettings(s => ({...s, language: code}))} className={`w-full p-2 text-sm rounded-lg font-semibold border-2 transition-colors ${language === code ? `border-blue-500 ${lightTheme.cellHighlight} ${lightTheme.userText}` : `border-transparent ${theme.button}`}`}>
+                    <button key={code} onClick={() => { setSettings(s => ({...s, language: code})); audioManager.playSound('click'); }} className={`w-full p-2 text-sm rounded-lg font-semibold border-2 transition-colors ${language === code ? `border-blue-500 ${lightTheme.cellHighlight} ${lightTheme.userText}` : `border-transparent ${theme.button}`}`}>
                         {name}
                     </button>
                 ))}
@@ -350,24 +412,24 @@ const Game: React.FC = () => {
           </div>
         </Modal>
 
-        <Modal show={isThemesOpen} onClose={() => setThemesOpen(false)} title={t('themes')} theme={theme}>
+        <Modal show={isThemesOpen} onClose={() => { setThemesOpen(false); audioManager.playSound('click'); }} title={t('themes')} theme={theme}>
           <div className="space-y-3">
             <button
-              onClick={() => { setSettings(s => ({...s, theme: 'light'})); closeAllModals(); }}
+              onClick={() => { setSettings(s => ({...s, theme: 'light'})); audioManager.playSound('click'); closeAllModals(); }}
               className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'light' ? `border-blue-500 ${lightTheme.cellHighlight}` : `border-transparent ${theme.button}`}`}
             >
               <Sun className={`w-5 h-5 ${themeName === 'light' ? 'text-blue-500' : theme.text}`} />
               <span className={`${themeName === 'light' ? lightTheme.userText : theme.text}`}>{t('lightTheme')}</span>
             </button>
             <button
-              onClick={() => { setSettings(s => ({...s, theme: 'warm'})); closeAllModals(); }}
+              onClick={() => { setSettings(s => ({...s, theme: 'warm'})); audioManager.playSound('click'); closeAllModals(); }}
               className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'warm' ? `border-red-500 ${warmTheme.cellHighlight}` : `border-transparent ${theme.button}`}`}
             >
               <Flame className={`w-5 h-5 ${themeName === 'warm' ? 'text-red-500' : theme.text}`} />
               <span className={`${themeName === 'warm' ? warmTheme.userText : theme.text}`}>{t('warmTheme')}</span>
             </button>
             <button
-              onClick={() => { setSettings(s => ({...s, theme: 'dark'})); closeAllModals(); }}
+              onClick={() => { setSettings(s => ({...s, theme: 'dark'})); audioManager.playSound('click'); closeAllModals(); }}
               className={`w-full p-4 rounded-xl border-2 transition-colors flex items-center space-x-3 ${themeName === 'dark' ? 'border-blue-500 bg-blue-900/20' : `border-transparent ${theme.button}`}`}
             >
               <Moon className={`w-5 h-5 ${themeName === 'dark' ? 'text-blue-500' : theme.text}`} />
@@ -376,14 +438,14 @@ const Game: React.FC = () => {
           </div>
         </Modal>
 
-        <Modal show={isAboutOpen} onClose={() => setAboutOpen(false)} title={t('aboutTitle')} theme={theme}>
+        <Modal show={isAboutOpen} onClose={() => { setAboutOpen(false); audioManager.playSound('click'); }} title={t('aboutTitle')} theme={theme}>
           <div className="space-y-4 text-sm">
             <p>{t('aboutText1')}</p>
-            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.5.0'})}</p>
+            <p className="text-xs opacity-70">{t('aboutVersion', {version: '0.6.0'})}</p>
           </div>
         </Modal>
 
-        <Modal show={isNewGameOpen} onClose={() => setNewGameOpen(false)} title={t('newGame')} theme={theme}>
+        <Modal show={isNewGameOpen} onClose={() => { setNewGameOpen(false); audioManager.playSound('click'); }} title={t('newGame')} theme={theme}>
             <div className="space-y-4">
                 <div>
                     <label className="font-medium block mb-2">{t('gameMode')}</label>
@@ -427,6 +489,7 @@ const Game: React.FC = () => {
                                     onClick={() => {
                                         if (isAvailable) {
                                             setTempGameConfig(c => ({...c, difficulty: diff}));
+                                            audioManager.playSound('click');
                                         }
                                     }}
                                     disabled={!isAvailable}
@@ -453,13 +516,13 @@ const Game: React.FC = () => {
             </div>
         </Modal>
 
-        <Modal show={isWinModalOpen} onClose={() => setWinModalOpen(false)} title={t('winTitle')} theme={theme}>
+        <Modal show={isWinModalOpen} onClose={() => { setWinModalOpen(false); audioManager.playSound('click'); }} title={t('winTitle')} theme={theme}>
             <div className="space-y-4 text-center">
                 <Award className="w-16 h-16 mx-auto text-amber-500" strokeWidth={1.5} />
                 <p className="text-lg">{t('winText')}</p>
                 <p className="text-2xl font-bold">{formatTime(time)}</p>
                 <button
-                    onClick={() => setNewGameOpen(true)}
+                    onClick={() => { setNewGameOpen(true); audioManager.playSound('click'); }}
                     className={`w-full mt-4 p-4 rounded-xl font-bold transition-colors ${theme.numberButton} text-white`}
                 >
                     {t('winPlayAgain')}

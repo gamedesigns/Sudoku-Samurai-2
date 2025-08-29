@@ -40,5 +40,7 @@
   "hiddenSingleExplanation": "While other numbers might fit in this cell, this number can *only* go in this specific cell within its row, column, or box.",
   "hintNextStep": "Click here to reveal the number.",
   "noPuzzleError": "Sorry, no puzzles are available for this mode and difficulty yet.",
-  "startFullscreen": "Start in Fullscreen"
+  "startFullscreen": "Start in Fullscreen",
+  "musicVolume": "Music Volume",
+  "sfxVolume": "Sound Effects Volume"
 }

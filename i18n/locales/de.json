@@ -40,5 +40,7 @@
   "hiddenSingleExplanation": "Während andere Zahlen in diese Zelle passen könnten, kann diese Zahl *nur* in diese spezifische Zelle innerhalb ihrer Reihe, Spalte oder ihres Kastens platziert werden.",
   "hintNextStep": "Klicken Sie hier, um die Zahl aufzudecken.",
   "noPuzzleError": "Für diesen Modus und Schwierigkeitsgrad sind leider noch keine Rätsel verfügbar.",
-  "startFullscreen": "Im Vollbildmodus starten"
+  "startFullscreen": "Im Vollbildmodus starten",
+  "musicVolume": "Musik-Lautstärke",
+  "sfxVolume": "Effekt-Lautstärke"
 }

@@ -31,6 +31,8 @@ export type Hint = {
 
 export type ThemeName = 'light' | 'warm' | 'dark';
 
+export type SoundEvent = 'placeNumber' | 'delete' | 'error' | 'click';
+
 export interface AppSettings {
     theme: ThemeName;
     highlightMode: boolean;
@@ -38,6 +40,9 @@ export interface AppSettings {
     mistakeChecker: boolean;
     gameConfig: GameConfig;
     startFullscreen: boolean;
+    musicVolume: number;
+    sfxVolume: number;
+    isMuted: boolean;
 }
 
 export interface Theme {

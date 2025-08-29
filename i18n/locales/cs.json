@@ -40,5 +40,7 @@
   "hiddenSingleExplanation": "Ačkoli se do této buňky mohou hodit i jiná čísla, toto číslo může jít *pouze* do této konkrétní buňky v rámci svého řádku, sloupce nebo boxu.",
   "hintNextStep": "Klikněte sem pro odhalení čísla.",
   "noPuzzleError": "Pro tento režim a obtížnost bohužel zatím nejsou k dispozici žádné hádanky.",
-  "startFullscreen": "Spustit na celou obrazovku"
+  "startFullscreen": "Spustit na celou obrazovku",
+  "musicVolume": "Hlasitost hudby",
+  "sfxVolume": "Hlasitost efektů"
 }

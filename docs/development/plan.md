@@ -1,7 +1,7 @@
 # Sudoku Samurai: Development Plan
 
 -   **Author**: Daniel Sandner
--   **Current Version**: v0.5.0
+-   **Current Version**: v0.6.0
 
 This document outlines the development roadmap for Sudoku Samurai, translating the ideas from the initial design document into a structured, phased implementation plan.
 
@@ -67,10 +67,11 @@ This document outlines the development roadmap for Sudoku Samurai, translating t
 
 ---
 
-### 🚧 Phase 5: The Master's Path - Advanced Features (In Progress)
+### 🚧 Phase 5: The Master's Path - Polish & Immersion (In Progress)
 
-**Goal**: Add the most complex game modes and advanced UI enhancements.
+**Goal**: Add advanced features, polish, and immersive elements.
 
+-   [x] **Audio System**: Implemented background music, victory music, and sound effects with full user controls.
 -   **Upcoming in this Phase**:
     -   Implement **Hyper Sudoku** and **Color Sudoku**.
     -   Implement the **"Swoosh" Input** method (drag-and-drop number entry).

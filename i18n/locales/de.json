@@ -52,6 +52,7 @@
   "musicProfile_mixed": "Gemischt",
   "phistomefelRing": "Phistomefel-Ring",
   "displayModeTooltip": "Anzeige wechseln (Zahlen, Farben, Buchstaben, Japanisch, Kinder)",
+  "boardStyleTooltip": "Brettstil wechseln (Linien / Lücken)",
   "displayMode_number": "Zahlen",
   "displayMode_color": "Farben",
   "displayMode_letter": "Buchstaben",

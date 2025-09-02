@@ -80,6 +80,7 @@ export interface AppSettings {
     phistomefelRing: boolean;
     displayMode: DisplayMode;
     swooshInput: boolean;
+    boardStyle: 'classic' | 'gaps';
 }
 
 export interface Theme {
@@ -109,4 +110,5 @@ export interface Theme {
   phistoRingCornerBg: string;
   phistoRingCenterBg: string;
   progressBg: string;
+  gridLine: string;
 }

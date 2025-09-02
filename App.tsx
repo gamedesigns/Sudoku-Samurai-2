@@ -1,7 +1,7 @@
 
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Play, Settings, Palette, RefreshCw, Info, Lightbulb, Brush, Swords } from 'lucide-react';
+import { Play, Settings, Palette, RefreshCw, Info, Lightbulb, Brush, Swords, LayoutGrid } from 'lucide-react';
 import { lightTheme, darkTheme, warmTheme } from './themes.ts';
 import { AppSettings, DisplayMode, GameConfig, Player } from './types.ts';
 import { formatTime } from './utils.ts';
@@ -111,6 +111,11 @@ const Game: React.FC = () => {
         const nextIndex = (modes.indexOf(settings.displayMode) + 1) % modes.length;
         setSettings(s => ({ ...s, displayMode: modes[nextIndex] }));
     };
+    
+    const handleBoardStyleChange = () => {
+        audioManager.playSound('click');
+        setSettings(s => ({ ...s, boardStyle: s.boardStyle === 'classic' ? 'gaps' : 'classic' }));
+    };
 
     const currentDuelPlayer = duel.duelState ? duel.duelState.players[duel.duelState.currentPlayerIndex] : null;
     // FIX: Explicitly type currentConfig as GameConfig to resolve type inference issues.
@@ -146,6 +151,7 @@ const Game: React.FC = () => {
                         <div className="flex justify-between items-center px-2 max-w-md mx-auto w-full">
                             <div className="flex items-center space-x-2">
                                 <button onClick={handleDisplayModeChange} className={`p-1.5 rounded-md ${theme.button}`} title={t('displayModeTooltip')}><Brush className="w-4 h-4" /></button>
+                                <button onClick={handleBoardStyleChange} className={`p-1.5 rounded-md ${theme.button}`} title={t('boardStyleTooltip')}><LayoutGrid className="w-4 h-4" /></button>
                                 <div className="text-sm font-medium">{t(settings.gameConfig.mode)} • {t(settings.gameConfig.difficulty.toLowerCase())}</div>
                             </div>
                             <div className="text-lg font-semibold tabular-nums">{formatTime(time)}</div>
@@ -154,7 +160,7 @@ const Game: React.FC = () => {
                     
                     <div className="game-layout flex flex-col items-center flex-grow justify-center">
                         <div className="board-wrapper w-full max-w-md">
-                            <SudokuBoard grid={grid} gameConfig={currentConfig} displayMode={settings.displayMode} selectedCell={selectedCell} dragTargetCell={dragTargetCell} dragOriginCell={dragOriginCell} theme={theme} highlightMode={settings.highlightMode} onCellClick={(r, c) => handleCellClick(r, c)} onCellDragStart={handleCellDragStart} incorrectCells={incorrectCells} hint={hint} phistomefelRing={settings.phistomefelRing} duelState={duel.duelState} />
+                            <SudokuBoard grid={grid} gameConfig={currentConfig} displayMode={settings.displayMode} selectedCell={selectedCell} dragTargetCell={dragTargetCell} dragOriginCell={dragOriginCell} theme={theme} highlightMode={settings.highlightMode} boardStyle={settings.boardStyle} onCellClick={(r, c) => handleCellClick(r, c)} onCellDragStart={handleCellDragStart} incorrectCells={incorrectCells} hint={hint} phistomefelRing={settings.phistomefelRing} duelState={duel.duelState} />
                         </div>
                         <div className="controls-wrapper mt-4 w-full max-w-md flex flex-col items-center space-y-4">
                              <GameControls theme={theme} inputMode={inputMode} setInputMode={setInputMode} gameState={gameState} openDuelSetup={() => modals.openModal(modals.setDuelSetupOpen)} />

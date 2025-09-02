@@ -32,12 +32,16 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ show, onClose, theme, curre
                     <select
                         value={`${tempGameConfig.mode}-${tempGameConfig.size}`}
                         onChange={(e) => {
-                            const [mode, sizeStr] = e.target.value.split('-');
+                            const parts = e.target.value.split('-');
+                            const sizeStr = parts.pop();
+                            if (!sizeStr) return; // Should not happen but good practice
+
+                            const mode = parts.join('-') as GameConfig['mode'];
                             const size = Number(sizeStr) as GameConfig['size'];
-                            const newMode = mode as GameConfig['mode'];
+                            
                             const difficulties = ['Novice', 'Easy', 'Medium', 'Hard'] as const;
-                            const firstAvailableDifficulty = difficulties.find(diff => hasPuzzles({ mode: newMode, size, difficulty: diff }));
-                            setTempGameConfig({ mode: newMode, size: size, difficulty: firstAvailableDifficulty || tempGameConfig.difficulty });
+                            const firstAvailableDifficulty = difficulties.find(diff => hasPuzzles({ mode, size, difficulty: diff }));
+                            setTempGameConfig({ mode, size, difficulty: firstAvailableDifficulty || tempGameConfig.difficulty });
                         }}
                         className={`w-full p-3 rounded-lg border-2 ${theme.border} ${theme.cardBg} focus:outline-none focus:ring-2 focus:ring-blue-400`}
                     >

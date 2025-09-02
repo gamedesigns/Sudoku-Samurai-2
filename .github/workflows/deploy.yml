@@ -1,20 +1,3 @@
-# GitHub Actions Workflow for Deploying Sudoku Samurai
-
-This file contains the full configuration for a GitHub Actions workflow that will automatically build and deploy your application to GitHub Pages.
-
-### How to Use
-
-1.  **Create the File on GitHub**: In your repository on the GitHub website, navigate to the "Actions" tab. Click "set up a workflow yourself".
-2.  **Name the File**: Name the file `deploy.yml` (or any other `.yml` name). GitHub will automatically place it in the correct `.github/workflows/` directory.
-3.  **Copy and Paste**: Copy the entire content below and paste it into the editor on GitHub.
-4.  **Commit**: Commit the new file directly to your `main` branch.
-5.  **Configure Pages**: Go to your repository's "Settings" -> "Pages". Under "Build and deployment", change the "Source" to **"GitHub Actions"**.
-
-After you commit this file, the Action will run automatically on every push to the `main` branch, deploying a production-optimized version of your site.
-
----
-
-```yaml
 # GitHub Actions Workflow for deploying the Sudoku Samurai app
 
 name: Deploy to GitHub Pages
@@ -85,4 +68,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-```

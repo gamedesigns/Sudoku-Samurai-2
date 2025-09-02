@@ -1,59 +1,43 @@
 # Sudoku Samurai: Deployment Guide
 
-This document provides instructions on how to deploy the Sudoku Samurai application to popular static hosting platforms like GitHub Pages and Netlify.
+This document provides instructions on how to deploy the Sudoku Samurai application to a production environment on **GitHub Pages**.
 
-Because this project is currently set up to run in a **"no-build-step" environment**, the deployment process is simpler than that of a typical modern web application. We are essentially just serving a set of static files.
+### The Hybrid Environment Challenge
 
----
+This project is built to run in two different environments:
+1.  **The AI Studio**: A "no-build-step" environment where libraries, CSS, and transpilers are loaded from a CDN at runtime.
+2.  **Production (GitHub Pages)**: A standard web environment that requires optimized, pre-compiled static files for performance and reliability.
 
-### Method 1: Deploying to GitHub Pages
-
-This is the recommended method for easily sharing your project.
-
-#### Configuration Steps:
-
-1.  **Push Your Code**: Make sure your latest working code is pushed to your GitHub repository (`gamedesigns/Sudoku-Samurai-2`).
-
-2.  **Navigate to Settings**: In your repository on GitHub, click on the **"Settings"** tab.
-
-3.  **Go to Pages**: In the left sidebar, click on **"Pages"**.
-
-4.  **Configure the Source**:
-    -   Under the "Build and deployment" section, for the **Source**, select **"Deploy from a branch"**.
-    -   A new dropdown menu will appear.
-    -   **Branch**: Select your main branch (usually `main`).
-    -   **Folder**: Keep the default option, which is **`/ (root)`**.
-
-5.  **Save and Deploy**:
-    -   Click the **"Save"** button.
-    -   GitHub will automatically start the deployment process. Wait a minute or two, and a green banner will appear at the top of the Pages settings with the URL to your live site.
-
-Your application is now live! Every time you push a new commit to your `main` branch, GitHub Pages will automatically update your live site with the latest changes.
+The old method of "Deploy from a branch" does not work because it fails to compile our TypeScript/JSX code, leading to browser errors. The correct method is to use a **build process** to transform our development code into a production-ready format.
 
 ---
 
-### Method 2: Deploying to Netlify (or Vercel)
+### Recommended Deployment: GitHub Actions
 
-Platforms like Netlify offer a very similar and simple deployment process for static sites.
+The best way to deploy this application is to use the **GitHub Actions workflow** provided in this project. This automates the entire build-and-deploy process.
 
-#### Configuration Steps:
+#### One-Time Setup Steps:
 
-1.  **Sign Up/Log In**: Create an account on [Netlify](https://www.netlify.com/) and log in.
+1.  **Create the Workflow File**:
+    *   The complete configuration for the workflow is located in the [**`docs/development/deploy_yml.md`**](./deploy_yml.md) file.
+    *   Go to your repository on the GitHub website and click the **"Actions"** tab.
+    *   Click "set up a workflow yourself".
+    *   Name the file **`deploy.yml`**.
+    *   **Copy the entire `yaml` block** from `deploy_yml.md` and paste it into the new file on GitHub.
+    *   Commit the file directly to your `main` branch.
 
-2.  **Connect to GitHub**: Authorize Netlify to access your GitHub account.
+2.  **Configure the Pages Source**:
+    *   In your repository on GitHub, go to the **"Settings"** tab.
+    *   In the left sidebar, click on **"Pages"**.
+    *   Under the "Build and deployment" section, change the **Source** from "Deploy from a branch" to **"GitHub Actions"**.
 
-3.  **Add a New Site**:
-    -   From your dashboard, click **"Add new site"** and choose **"Import an existing project"**.
-    -   Select **"GitHub"** as your provider.
-    -   Find and select your `Sudoku-Samurai-2` repository.
+#### How It Works
 
-4.  **Configure Site Settings**:
-    -   Netlify will ask for your build settings. Because we don't have a build step, the configuration is very simple:
-    -   **Build command**: Leave this field **completely empty**.
-    -   **Publish directory**: Set this to the root of your project. You can usually leave this empty or enter a single period (`.`).
+From now on, every time you push a change to your `main` branch, the GitHub Action will automatically:
+1.  Check out your code.
+2.  Install all necessary dependencies.
+3.  **Transform `index.html`**, removing the AI Studio-specific scripts.
+4.  Run the Vite build process (`npm run build`) to create an optimized version of your app in a `dist` folder.
+5.  Deploy the contents of that `dist` folder to your GitHub Pages site.
 
-5.  **Deploy**:
-    -   Click the **"Deploy site"** button.
-    -   Netlify will deploy your files, and in under a minute, it will provide you with a live URL for your application.
-
-Like GitHub Pages, Netlify will automatically redeploy your site every time you push an update to your connected GitHub branch.
+Wait a few minutes for the first action to complete. Your live, production-quality application will then be available at the URL shown in your Pages settings.

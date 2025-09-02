@@ -52,6 +52,7 @@
   "musicProfile_mixed": "Mixed",
   "phistomefelRing": "Phistomefel Ring",
   "displayModeTooltip": "Switch Display (Numbers, Colors, Letters, Japanese, Kids)",
+  "boardStyleTooltip": "Switch Board Style (Lines / Gaps)",
   "displayMode_number": "Numbers",
   "displayMode_color": "Colors",
   "displayMode_letter": "Letters",

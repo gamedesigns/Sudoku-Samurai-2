@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Grid, Position, Theme, Cell, GameConfig, Hint, DisplayMode, DuelState, PlayerColor } from '../types.ts';
 import { COLOR_MAP, LETTER_MAP, JAPANESE_NUMBER_MAP, KIDS_ICON_MAP } from '../constants.tsx';
@@ -12,6 +13,7 @@ interface SudokuBoardProps {
   dragOriginCell: Position | null;
   theme: Theme;
   highlightMode: boolean;
+  boardStyle: 'classic' | 'gaps';
   onCellClick: (row: number, col: number) => void;
   onCellDragStart: (row: number, col: number) => void;
   incorrectCells: Set<string>;
@@ -36,6 +38,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
   dragOriginCell,
   theme,
   highlightMode,
+  boardStyle,
   onCellClick,
   onCellDragStart,
   incorrectCells,
@@ -111,13 +114,18 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
     
     const fontClasses = size === 9 ? 'text-xl sm:text-2xl' : size === 6 ? 'text-lg sm:text-xl' : 'text-base sm:text-lg';
 
-    const borderClasses = `
-      border-t border-l ${theme.border}
-      ${(col + 1) % boxCols === 0 ? `border-r-2 ${theme.borderThick}` : `border-r ${theme.border}`}
-      ${(row + 1) % boxRows === 0 ? `border-b-2 ${theme.borderThick}` : `border-b ${theme.border}`}
-      ${col === 0 ? `border-l-2 ${theme.borderThick}`: ''}
-      ${row === 0 ? `border-t-2 ${theme.borderThick}`: ''}
-    `;
+    const borderClasses = boardStyle === 'classic'
+      ? `
+          border-t border-l ${theme.border}
+          ${(col + 1) % boxCols === 0 ? `border-r-2 ${theme.borderThick}` : `border-r ${theme.border}`}
+          ${(row + 1) % boxRows === 0 ? `border-b-2 ${theme.borderThick}` : `border-b ${theme.border}`}
+          ${col === 0 ? `border-l-2 ${theme.borderThick}`: ''}
+          ${row === 0 ? `border-t-2 ${theme.borderThick}`: ''}
+        `
+      : `
+          ${(row + 1) % boxRows === 0 && row < size - 1 ? `border-b-2 ${theme.borderThick}` : ''}
+          ${(col + 1) % boxCols === 0 && col < size - 1 ? `border-r-2 ${theme.borderThick}` : ''}
+        `;
 
     let stateClasses = '';
     if (isIncorrect && displayMode !== 'color') {
@@ -134,9 +142,11 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
       stateClasses = theme.phistoRingCornerBg;
     } else if (isPhistoCenter) {
         stateClasses = theme.phistoRingCenterBg;
-    } else if (isHighlighted || isHyperBox) {
+    } else if (isHighlighted) {
       stateClasses = `${theme.cellHighlight}`;
-    } else if (isDiagonal) {
+    } else if (boardStyle === 'gaps' && isHyperBox) {
+        stateClasses = `${theme.cellHighlight}`;
+    } else if (boardStyle === 'gaps' && isDiagonal) {
         stateClasses = `${theme.cellHighlight} bg-opacity-50`
     } else if (value === 0) {
       stateClasses = theme.cellEmpty;
@@ -212,7 +222,7 @@ const SudokuBoard: React.FC<SudokuBoardProps> = ({
   return (
     <div className={`w-full mx-auto ${theme.cardBg} rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-4 border-2 ${theme.borderThick}`} data-sudoku-board>
       <div 
-        className="grid bg-transparent"
+        className={`grid ${boardStyle === 'gaps' ? `gap-px ${theme.gridLine}` : ''}`}
         style={{ gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))` }}
       >
         {grid.map((row, rowIndex) =>

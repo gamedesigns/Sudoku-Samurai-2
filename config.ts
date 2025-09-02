@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     phistomefelRing: false,
     displayMode: 'number',
     swooshInput: true,
+    boardStyle: 'gaps',
 };
 
 export const LANGUAGES: { code: Language; name: string }[] = [

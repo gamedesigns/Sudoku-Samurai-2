@@ -27,6 +27,7 @@ export const lightTheme: Theme = {
   phistoRingCornerBg: 'bg-purple-100',
   phistoRingCenterBg: 'bg-orange-100',
   progressBg: '#e2e8f0', // slate-200
+  gridLine: 'bg-slate-300',
 };
 
 export const warmTheme: Theme = {
@@ -56,6 +57,7 @@ export const warmTheme: Theme = {
   phistoRingCornerBg: 'bg-purple-100',
   phistoRingCenterBg: 'bg-orange-100',
   progressBg: '#fde68a', // amber-200
+  gridLine: 'bg-amber-300',
 };
 
 export const darkTheme: Theme = {
@@ -85,4 +87,5 @@ export const darkTheme: Theme = {
   phistoRingCornerBg: 'bg-purple-900/40',
   phistoRingCenterBg: 'bg-orange-900/40',
   progressBg: '#374151', // gray-700
+  gridLine: 'bg-gray-500',
 };

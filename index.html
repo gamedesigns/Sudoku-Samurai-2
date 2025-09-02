@@ -5,59 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sudoku Samurai</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E侍%3C/text%3E%3C/svg%3E">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              // Light Theme
-              'slate-50': '#f8fafc',
-              'slate-100': '#f1f5f9',
-              'slate-200': '#e2e8f0',
-              'slate-300': '#cbd5e1',
-              'slate-500': '#64748b',
-              'slate-800': '#1e293b',
-              'slate-900': '#0f172a',
-              'blue-100': '#dbeafe',
-              'blue-500': '#3b82f6',
-              'blue-600': '#2563eb',
-              'blue-700': '#1d4ed8',
-              'red-200': '#fecaca',
-              'red-700': '#b91c1c',
-              'green-100': '#dcfce7',
-              'green-300': '#86efac',
-              'green-500': '#22c55e',
-              // Warm Theme
-              'amber-50': '#fffbeb',
-              'amber-100': '#fef3c7',
-              'amber-200': '#fde68a',
-              'amber-300': '#fcd34d',
-              'amber-600': '#d97706',
-              'amber-800': '#92400e',
-              'red-100': '#fee2e2',
-              'red-400': '#f87171',
-              'red-500': '#ef4444',
-              'red-600': '#dc2626',
-              // Dark Theme
-              'gray-300': '#d1d5db',
-              'gray-500': '#6b7280',
-              'gray-600': '#4b5563',
-              'gray-700': '#374151',
-              'gray-800': '#1f2937',
-              'gray-900': '#111827',
-              'blue-900': '#1e3a8a',
-              'cyan-400': '#22d3ee',
-              'cyan-500': '#06b6d4',
-              'red-400': '#f87171',
-              'red-900': '#7f1d1d',
-              'green-400': '#4ade80',
-              'green-700': '#15803d',
-            }
-          }
-        }
-      }
-    </script>
     <style>
       /* Apply layout for landscape orientation on devices like phones */
       @media (orientation: landscape) and (max-height: 600px) {
@@ -82,6 +29,31 @@
         }
       }
     </style>
+    <!-- START: Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Light Theme
+              'slate-50': '#f8fafc', 'slate-100': '#f1f5f9', 'slate-200': '#e2e8f0', 'slate-300': '#cbd5e1', 'slate-500': '#64748b', 'slate-800': '#1e293b', 'slate-900': '#0f172a',
+              'blue-100': '#dbeafe', 'blue-500': '#3b82f6', 'blue-600': '#2563eb', 'blue-700': '#1d4ed8',
+              'red-200': '#fecaca', 'red-700': '#b91c1c', 'green-100': '#dcfce7', 'green-300': '#86efac', 'green-500': '#22c55e',
+              // Warm Theme
+              'amber-50': '#fffbeb', 'amber-100': '#fef3c7', 'amber-200': '#fde68a', 'amber-300': '#fcd34d', 'amber-600': '#d97706', 'amber-800': '#92400e',
+              'red-100': '#fee2e2', 'red-400': '#f87171', 'red-500': '#ef4444', 'red-600': '#dc2626',
+              // Dark Theme
+              'gray-300': '#d1d5db', 'gray-500': '#6b7280', 'gray-600': '#4b5563', 'gray-700': '#374151', 'gray-800': '#1f2937', 'gray-900': '#111827',
+              'blue-900': '#1e3a8a', 'cyan-400': '#22d3ee', 'cyan-500': '#06b6d4', 'red-900': '#7f1d1d', 'green-400': '#4ade80', 'green-700': '#15803d',
+            }
+          }
+        }
+      }
+    </script>
+    <!-- END: Tailwind CSS Play CDN -->
+
+    <!-- START: Import Map for AI Studio -->
     <script type="importmap">
 {
   "imports": {
@@ -90,18 +62,23 @@
     "react-dom": "https://esm.sh/react-dom@18.3.1",
     "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
     "react-dom/": "https://esm.sh/react-dom@18.3.1/",
-    "lucide-react": "https://esm.sh/lucide-react@0.344.0"
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0",
+    "vite": "https://aistudiocdn.com/vite@^7.1.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.2"
   }
 }
 </script>
-    <!-- Add Babel to transpile JSX/TSX in the browser -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- END: Import Map for AI Studio -->
+
+    <!-- START: Babel for JSX/TSX transpilation in browser -->
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+    <!-- END: Babel for JSX/TSX transpilation in browser -->
 <link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>
-    <!-- Change script type to text/babel so Babel can transpile it -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
+    <!-- SCRIPT FOR AI STUDIO (gets replaced during build) -->
+    <script type="text/babel" data-type="module" src="/index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
